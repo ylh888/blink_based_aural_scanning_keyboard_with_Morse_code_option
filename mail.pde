@@ -5,6 +5,9 @@
  cf http://stackoverflow.com/questions/1248510/convert-string-to-keyevents
  */
 
+Process mailProcess;
+OutputStream toMail;
+
 void doMail() {
 
   switchToMail();
@@ -32,20 +35,34 @@ void doMail() {
 }
 
 void mousePressed() {
-  //switchToMail();
-  //type('i');
+  println("mouse pressed");
+  switchToEmail("p");
+  //type('p');
 }
 
 void switchToMail() {
   try {
-    //Runtime.getRuntime().exec("/usr/bin/osascript -e 'tell application \"Safari\" to activate'");
-    Runtime.getRuntime().exec("open /Applications/Safari.app");
-    delay(100);
-    lastPresented = millis();
+    String[] args1 = {
+      "/usr/local/bin/alpine"  // , "-ven+f4", "-g 7", txt
+    };
+    Runtime r = Runtime.getRuntime();
+    Process p = r.exec(args1);
+    delay(500);
   } 
   catch (IOException ex) {
     println(ex.toString());
   }
+  /*
+  try {
+   //Runtime.getRuntime().exec("/usr/bin/osascript -e 'tell application \"Safari\" to activate'");
+   Runtime.getRuntime().exec("open /Applications/Safari.app");
+   delay(100);
+   lastPresented = millis();
+   } 
+   catch (IOException ex) {
+   println(ex.toString());
+   }
+   */
 }
 
 void launchMail() {

@@ -199,8 +199,7 @@ void pick() {
   case BROWSER:
     //print("X");
     if ( curItem.equals("return") ) {
-      robot.keyPress(KeyEvent.VK_ENTER);
-      robot.keyRelease(KeyEvent.VK_ENTER);
+
     } else if (curItem.equals("pagedown") ) {
       robot.keyPress(KeyEvent.VK_SPACE);
       robot.keyRelease(KeyEvent.VK_SPACE);

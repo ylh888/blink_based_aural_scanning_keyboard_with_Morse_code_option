@@ -5,16 +5,16 @@
  - a dash = 3 units
  - space between parts of the same letter is one unit
  - space between letters is 3 units
- - space between words is 7 units
+ - space between words is 10 units (standard==7)
  
  special Morse
- - 6 dots for swithing back to scanning mode
+ - 6 dots for switching back to scanning mode
  
  inDelete state
  0 - deleted buffer char and current morseStr
  1 - (if more del, then delete previous word)
  */
- 
+
 int inDelete = 0;  
 int morseSpeed = 4;
 
@@ -28,7 +28,7 @@ boolean TRANSIT = false;
 
 void doMorse() {
   int sinceTransition = (millis() - lastTransit);
-  
+
   if ( pause ) return;
 
   // mark =============
@@ -42,11 +42,12 @@ void doMorse() {
       print(morseStr); 
 
       if ( timeLapse > 7*units ) {
+        /* 2015-05-12 --- what if we dont add space here
         if ( !wroteSpace) {
           processLetter(); // first process letter, than add space
           if ( buffer.length() > 0 && buffer.charAt( buffer.length()-1) != ' ') {
             buffer += " ";
-           //ylh delay(500);
+            //ylh delay(500);
             howmany = buffer.length();
 
             int i = menuObj.getJSONObject( "space" ).getInt("sound");
@@ -57,7 +58,9 @@ void doMorse() {
             }
           }
           wroteSpace = true;
+          
         }
+        */
       } else if ( timeLapse > 3*units ) { // space between letters
         processLetter();
         //wroteSpace = false;
@@ -77,7 +80,7 @@ void doMorse() {
     print("S");
     // space =============
     if (TRANSIT) {  // after transition to space (downtick) => deal with MARK here
-      
+
       println("-T*");
       print(timeLapse); 
       print("* c=");
@@ -107,7 +110,7 @@ void doMorse() {
       print("| t="); 
       println(buffer);
     } else {  // handle very long SPACE here - short spaces handled by Mark uptick
-      if ( sinceTransition > 10*units ) {
+      if ( sinceTransition > 10*units ) { // was 10 units
         if ( !wroteSpace) {  
           processLetter(); // first process letter, than add space     
           if ( buffer.length() > 0 && buffer.charAt( buffer.length()-1) != ' ') { 
@@ -124,13 +127,13 @@ void doMorse() {
           }
         }
         wroteSpace = true;
-      }  /*else if ( sinceTransition > 3*units ) { // space between letters
-       processLetter();
-       //wroteSpace = false;
-       } else {  // very short space - it is part of a letter; dealt with by mark
-       //
-       }
-       */
+      } else if ( sinceTransition > 3*units ) { // space between letters
+        processLetter();
+        //wroteSpace = false;
+      } else {  // very short space - it is part of a letter; dealt with by mark
+        //
+      }
+      
     }
   }
   if ( TRANSIT ) {
@@ -218,15 +221,15 @@ void procLetter() {
       lastPresented = millis(); // + 2*seconds;
       firstTimeMorse = millis();
       MARK = TRANSIT = false;
-      
+
       pauseFor(1000, false);
 
       /*int i=menuObj.getJSONObject( "use_scanning" ).getInt("sound");
-      if ( voiceon ) sounds[i].play();
-      sounds[i].rewind();
-      */
+       if ( voiceon ) sounds[i].play();
+       sounds[i].rewind();
+       */
       sayWords(m);
-      
+
       wroteSpace = true;
       morseStr = "";
       return;
@@ -244,12 +247,12 @@ void procLetter() {
     howmany = buffer.length();
     int i=menuObj.getJSONObject( m ).getInt("sound");
     sayWords( m );
-    
+
     textBySound[howmany-1] = i;
-/*
+    /*
     if ( voiceon ) sounds[i].play();
-    sounds[i].rewind();
-*/
+     sounds[i].rewind();
+     */
     print(buffer);
     println("<<");
   }

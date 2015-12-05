@@ -1,4 +1,6 @@
 /* aural_keyboard: 20150225 : ylh
+ experimental version
+ 
  based on blink_opencv3 20150219 - 20150225
  see manual file for Manual
  
@@ -27,6 +29,8 @@ import org.opencv.core.Core;
 
 import java.io.*;
 
+boolean testing = false;  // jump to new code in 'test'
+
 // 0 - waiting; when both eyes closed, triggered alarmStartTime ->1
 // 1 && alarmStartTime > x msec, buzzAlarm.on -> 2
 // 2 && both eyes open -> 0
@@ -48,7 +52,7 @@ boolean useColor = true;
 final int REGULAR = 0;  
 final int BROWSER = 1;
 final int EMAIL = 2;
-int mode = REGULAR; // 0=regular aural keyboard; 1=browser; 2=email
+int mode = REGULAR; // 0=regular aural keyboard; 1=browser; 2=emailpp
 
 // enum for the variable 'inputType'
 final int MORSE = 1; 
@@ -111,19 +115,19 @@ int selected = 0;
 
 void setup() {
 
-  textlines[0] = "";
-  //textlines[1] = "Please turn on the TV";
-  textlines[1] = "Thank you";
-  currentLine = 1;
-  //readIt();
-  //readByGoogle();
+  if ( testing ) {
+    testSetup();
+    return;
+  }
 
-  /* test new fragments here
+  textlines[0]="";
+  /* test new fragments of speech here
    textlines[0] = "The quick brown fox jumps over the lazy dog";
    textlines[1] = "Please turn on the TV";
    textlines[2] = "Thank you";
    currentLine = 3;
    readIt();
+   //readByGoogle();
    if (true) return;   
    */
 
@@ -134,7 +138,27 @@ void setup() {
   buzzDot = new Buzzer( 800, 0.1 ); 
   buzzAlarm = new Buzzer( 1200, 0.8 );  
 
-  video = new Capture(this, 640/SCALE, 480/SCALE);
+  String[] cameras = Capture.list();
+
+  if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      print(i); 
+      print(": ");
+      println(cameras[i]);
+    }
+    // The camera can be initialized directly using an 
+    // element from the array returned by list():
+    //cam = new Capture(this, cameras[12]);
+    //cam.start();
+ 
+  }    
+  xvideo = new Capture(this, 640/SCALE, 480/SCALE);  
+//  video = new Capture(this, "name=USB 2.0 PC Cam,size=80x60,fps=30");  // using alternate camera
+  
   opencv = new OpenCV(this, 640/SCALE, 480/SCALE);
   //opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE); 
   opencv.loadCascade( OpenCV.CASCADE_EYE );
@@ -161,14 +185,16 @@ void setup() {
 
 
   //launchMail();
-  //text="";
 
   frameRate(FRAME_RATE);
 }
 
 void draw() {
 
-  //if (true) return;
+  if (testing) {
+    testDraw();
+    return;
+  }
 
   scale(SCALE);
   // timed operations checked here
@@ -218,6 +244,8 @@ void draw() {
 }
 
 void keyPressed() {
+
+  if ( testing ) return;
 
   switch( phase ) {
   case 0:
@@ -679,20 +707,15 @@ void readByGoogle() {
 
   try {
     String[] args1 = {
-      // "/usr/local/bin/speak", "-ven+f4", "-g 7", 
       "curl", "-A ", "Mozilla", 
       "http://translate.google.com/translate_tts?tl=en&q=" +
-        txt 
-
-        //" > tmp.mp3"
+        txt
     };
     Runtime r = Runtime.getRuntime();
     Process p = r.exec(args1);
 
-
     //http://www.ask-coder.com/1527922/java-file-redirection-both-ways-within-runtime-exec
     //   Process proc = Runtime.getRuntime().exec("...");
-
     InputStream standardOutputOfChildProcess = p.getInputStream();
     OutputStream dataToFile = new FileOutputStream("tmp.mp3");
 
@@ -895,3 +918,20 @@ void initPhase1() {
  This command will speak: "This is some phonetic text input".
  
  */
+
+void ListCameras() { 
+  String[] cameras = Capture.list();
+
+  if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      print(i); 
+      print(": ");
+      println(cameras[i]);
+    }
+  }
+}
+
