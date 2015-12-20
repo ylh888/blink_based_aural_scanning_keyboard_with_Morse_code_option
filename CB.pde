@@ -107,9 +107,10 @@ void doCB() {
       pick(); 
       break;
     case 2: // read text from buffer
+      readIt(); 
       //readBuffer();
       //readByGoogle();
-      readIt();
+      // readByEspeak();
       break;
     case 3: // retrieve last line from textlines, store in buffer
       retrieveLine();
