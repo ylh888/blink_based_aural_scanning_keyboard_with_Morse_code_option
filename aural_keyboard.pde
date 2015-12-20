@@ -1,5 +1,5 @@
-/* aural_keyboard: 20150225 : ylh
- experimental version
+/* aural_keyboard: 2015-12-19 : ylh
+ on github.com as blink_based_aural_scanning_keyboard_with_Morse_code_option
  
  based on blink_opencv3 20150219 - 20150225
  see manual file for Manual
@@ -30,6 +30,12 @@ import org.opencv.core.Core;
 import java.io.*;
 
 boolean testing = false;  // jump to new code in 'test'
+boolean useOldcode = false; // testing fragments
+
+boolean useWebcam = false; // use webcam (true) or eye cam (false)
+boolean debug = true;
+boolean useColor = false;
+boolean useGoogle = false;
 
 // 0 - waiting; when both eyes closed, triggered alarmStartTime ->1
 // 1 && alarmStartTime > x msec, buzzAlarm.on -> 2
@@ -44,9 +50,6 @@ boolean voiceon = true;
 // pause operations
 boolean pause = false;
 boolean callbellReady = true;
-
-boolean debug = false;
-boolean useColor = true;
 
 // enum for the variable 'mode'
 final int REGULAR = 0;  
@@ -105,6 +108,11 @@ Rectangle roiLeft = new Rectangle(0, 0, 0, 0);
 Rectangle roiRight = new Rectangle(0, 0, 0, 0);
 PImage IMsource, IMnormal, IMyes, IMno; 
 
+int  screenWidth = 1240;
+int  screenHeight = 880;
+int camWidth = 360;
+int camHeight = 256;
+
 // translating coordinates to here
 int offsetX = 300, offsetY = 300;
 
@@ -121,18 +129,19 @@ void setup() {
   }
 
   textlines[0]="";
-  /* test new fragments of speech here
-   textlines[0] = "The quick brown fox jumps over the lazy dog";
-   textlines[1] = "Please turn on the TV";
-   textlines[2] = "Thank you";
-   currentLine = 3;
-   readIt();
-   //readByGoogle();
-   if (true) return;   
-   */
+  /* test new fragments of speech here */
+  if ( false ) {
+    textlines[0] = "The quick brown fox jumps over the lazy dog";
+    textlines[1] = "Please turn on the TV";
+    textlines[2] = "Thank you";
+    currentLine = 3;
+    readIt();
+    if (true) return;
+  }   
 
   //size(640, 480);
-  size(1240, 880);
+  size(screenWidth, screenHeight);
+
 
   buzzDash = new Buzzer( 440, 0.05 );
   buzzDot = new Buzzer( 800, 0.1 ); 
@@ -154,11 +163,13 @@ void setup() {
     // element from the array returned by list():
     //cam = new Capture(this, cameras[12]);
     //cam.start();
- 
   }    
-  xvideo = new Capture(this, 640/SCALE, 480/SCALE);  
-//  video = new Capture(this, "name=USB 2.0 PC Cam,size=80x60,fps=30");  // using alternate camera
-  
+  if ( useWebcam ) {
+    video = new Capture(this, 640/SCALE, 480/SCALE);
+  } else {
+    video = new Capture(this, "name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
+  }
+
   opencv = new OpenCV(this, 640/SCALE, 480/SCALE);
   //opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE); 
   opencv.loadCascade( OpenCV.CASCADE_EYE );
@@ -181,8 +192,6 @@ void setup() {
   }
 
   doCBInit();
-
-
 
   //launchMail();
 
@@ -256,7 +265,12 @@ void keyPressed() {
   case 1:
     stroke(0);
     IMnormal = get( (SCALE*foundROI.x)+ offsetX, (SCALE*foundROI.y) + offsetY, SCALE*foundROI.width, SCALE*foundROI.height);
-    IMnormal.save("normal.jpg");
+    if ( useOldcode ) {
+      IMnormal.save("normal.jpg");
+    } else {
+      IMsource = trans2( IMnormal );
+      IMsource.save("normal.jpg");
+    }
     opencv2 = new OpenCV(this, "normal.jpg", useColor);
     opencv2.setGray(opencv2.getR().clone());
     Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
@@ -267,7 +281,12 @@ void keyPressed() {
   case 2:
     stroke(0);
     IMnormal = get( SCALE*foundROI.x+offsetX, SCALE*foundROI.y+offsetY, SCALE*foundROI.width, SCALE*foundROI.height);
-    IMnormal.save("yes.jpg");
+    if ( useOldcode ) {
+      IMnormal.save("yes.jpg");
+    } else {
+      IMsource = trans2( IMnormal ); 
+      IMsource.save("yes.jpg");
+    }
     opencv2 = new OpenCV(this, "yes.jpg", useColor);
     opencv2.setGray(opencv2.getR().clone());
     Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
@@ -276,17 +295,26 @@ void keyPressed() {
     break;
   case 3:
     stroke(0);
-    IMyes = get( SCALE*foundROI.x+offsetX, SCALE*foundROI.y+offsetY, SCALE*foundROI.width, SCALE*foundROI.height );
-    IMyes.save("no.jpg");
+    IMnormal = get( SCALE*foundROI.x+offsetX, SCALE*foundROI.y+offsetY, SCALE*foundROI.width, SCALE*foundROI.height );
+
+    //IMnormal = get(ROI.x, ROI.y, ROI.width, ROI.height);
+    if ( useOldcode ) {
+      IMnormal.save("no.jpg");
+    } else {
+      IMsource = trans2( IMnormal ); 
+      IMsource.save("no.jpg");
+    }
     opencv2 = new OpenCV(this, "no.jpg", useColor);
     opencv2.setGray(opencv2.getR().clone());
     Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
     noMat = opencv2.getGray();
 
-    foundROI.x-=10; 
-    foundROI.y-=10; 
-    foundROI.width +=20;
-    foundROI.height+=20;
+    /* changed
+     foundROI.x-=10; 
+     foundROI.y-=10; 
+     foundROI.width +=20;
+     foundROI.height+=20;
+     */
     phase = 4;  
     break;
   case 4:
@@ -384,17 +412,49 @@ void doPhase5() {
 
   fill(0, 0, 0); 
   stroke(0, 0, 0);
-  rect(0, 0, 640, ROI.y);
-  rect(0, ROI.y+ROI.height-20, 640, 480);
+  rect(0, 0, screenWidth, ROI.y); // blacken top
+  rect(0, ROI.y+ROI.height-20, screenWidth, screenHeight); // blacken bottom
 
   showInstruction();
   displayBuffer();
 
-  opencv.releaseROI();
-  opencv.setROI(foundROI.x, foundROI.y, foundROI.width, foundROI.height);
-  Mroi = opencv.getROI().clone(); 
-  opencv.releaseROI();
-  //opencv.setGray(Mroi);
+  if ( useOldcode) {
+    
+    IMnormal = get(foundROI.x+offsetX, foundROI.y + offsetY, foundROI.width, foundROI.height);
+    image( IMnormal, -300,-300 );
+    
+    opencv.releaseROI();
+    opencv.setROI(foundROI.x, foundROI.y, foundROI.width, foundROI.height);
+    debugROI("5old");
+    Mroi = opencv.getROI().clone(); 
+    opencv.releaseROI();
+    //opencv.setGray(Mroi);
+  } else {
+    
+    debugROI("5");
+    IMnormal = get(foundROI.x+offsetX, foundROI.y+offsetY, foundROI.width, foundROI.height);
+    image( IMnormal, -IMnormal.width, 0);
+    IMsource = trans2( IMnormal ); 
+    image( IMsource, -IMnormal.width, IMnormal.height) ; 
+    if (debug) {
+      println("5imange:" +IMsource.width+" "+IMsource.height);
+    }
+    /*
+    PImage retImg = trans2( IMsource );
+    opencv = new OpenCV(this, retImg );
+    //opencv.setROI( foundROI.x, foundROI.y, foundROI.width, foundROI.height);
+    opencv.releaseROI();
+    opencv.setROI(foundROI.x, foundROI.y, foundROI.width, foundROI.height);
+    Mroi = opencv.getROI().clone(); 
+     */
+    
+    opencv = new OpenCV( this, IMsource );
+    opencv.setROI(0,0,IMsource.width, IMsource.height);
+    Mroi = opencv.getROI().clone(); 
+    opencv.releaseROI();
+    //opencv.setGray(Mroi);
+  }
+
   Imgproc.morphologyEx(Mroi, Mroi, Imgproc.MORPH_GRADIENT, new Mat());
 
   Mat normalRes = new Mat();  
@@ -403,6 +463,10 @@ void doPhase5() {
   Imgproc.matchTemplate(Mroi, yesMat, yesRes, Imgproc.TM_CCORR_NORMED);
   Mat noRes = new Mat();  
   Imgproc.matchTemplate(Mroi, noMat, noRes, Imgproc.TM_CCORR_NORMED);
+  if ( debug ) {
+    println( "normal=" + Core.minMaxLoc(normalRes).maxVal + " yes=" + Core.minMaxLoc(yesRes).maxVal +" no=" + Core.minMaxLoc(noRes).maxVal);
+  }
+
   if ( Core.minMaxLoc(yesRes).maxVal > 0.7 && 
     ( Core.minMaxLoc(yesRes).maxVal > Core.minMaxLoc(normalRes).maxVal ) &&
     ( Core.minMaxLoc(yesRes).maxVal > Core.minMaxLoc(noRes).maxVal )  ) {
@@ -482,11 +546,11 @@ void doPhase4() {
   image(video, 0, 0 );
 
   IMnormal = loadImage( "normal.jpg");
-  image( IMnormal, 0, 0);
+  image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
   IMyes = loadImage( "yes.jpg");
-  image( IMyes, 0, IMnormal.height);
+  image( IMyes, - IMnormal.width, IMnormal.height ) ; //image( IMyes, 0, IMnormal.height);
   IMno = loadImage( "no.jpg");
-  image( IMno, 0, IMnormal.height+IMyes.height);
+  image( IMno, - IMnormal.width, IMnormal.height+IMyes.height ) ; //image( IMno, 0, IMnormal.height+IMyes.height);
   stroke(0, 255, 0);
   rect(ROI.x, ROI.y, ROI.width, ROI.height);
   stroke( 0, 0, 255);
@@ -505,9 +569,9 @@ void doPhase3() {
   image(video, 0, 0 );
 
   IMnormal = loadImage( "normal.jpg");
-  image( IMnormal, 0, 0);
+  image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
   IMyes = loadImage( "yes.jpg");
-  image( IMyes, 0, IMnormal.height);
+  image( IMyes, - IMnormal.width, IMnormal.height ) ; // image( IMyes, 0, IMnormal.height);
   stroke(0, 255, 0);
   rect(ROI.x, ROI.y, ROI.width, ROI.height);
 
@@ -522,7 +586,7 @@ void doPhase2() {
   image(video, 0, 0 );
   showInstruction();
   IMnormal = loadImage( "normal.jpg");
-  image( IMnormal, 0, 0);
+  image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
 
   stroke(0, 255, 0);
   rect(ROI.x, ROI.y, ROI.width, ROI.height);
@@ -530,26 +594,42 @@ void doPhase2() {
   stroke( 0, 0, 255);
   rect(  foundROI.x-2, foundROI.y-2, foundROI.width+4, foundROI.height+4 );
 
-  if ( debug) println( "2: " + foundROI.x + " " + foundROI.y + " " + foundROI.width+ " " +foundROI.height );
+  debugROI("2");
 }
 
 void doPhase1() {
-  ROI.width=120; 
-  ROI.height = 240;
-  ROI.x = 320/SCALE; // left eye
-  ROI.y = 240/SCALE - ROI.height/SCALE/2; 
+  opencv.loadImage(video);
+  image(video, 0, 0 );
   showInstruction();
 
-  boolean found = findEye( ROI );
-  if ( found ) {
-    if (debug) println( "1: " + foundROI.x + " " + foundROI.y + " " + foundROI.width+ " " +foundROI.height );
+  if ( useWebcam ) {
+    ROI.width=120; 
+    ROI.height = 240;
+    ROI.x = 320/SCALE; // left eye
+    ROI.y = 240/SCALE - ROI.height/SCALE/2; 
+    //showInstruction();
+
+    boolean found = findEye( ROI );
+
+    if ( found ) {
+      if (debug) println( "1: " + foundROI.x + " " + foundROI.y + " " + foundROI.width+ " " +foundROI.height );
+    }
+  } else {
+    // assume using 80x64
+    ROI.x = 0;
+    ROI.y = 0;
+    ROI.width = camWidth;
+    ROI.height = camHeight;
+    foundROI.x = 10;
+    foundROI.y = 10;
+    foundROI.width = camWidth - 20;
+    foundROI.height = camHeight - 20;
+    //showInstruction();
   }
 }
 
 boolean findEye( Rectangle roi ) {
-  opencv.loadImage(video);
-  image(video, 0, 0 );
-  showInstruction();
+
 
   noFill();
   strokeWeight(1);
@@ -669,8 +749,16 @@ void sayWords ( String s ) {
   }
 }
 
-// read text using espeak
 void readIt() {
+  if ( useGoogle ) {
+    readByGoogle();
+  } else {
+    readByEspeak();
+  }
+}
+
+// read text using espeak
+void readByEspeak() {
   String txt = "";
 
   for ( int i=0; i<=currentLine; i++ ) {
@@ -933,5 +1021,21 @@ void ListCameras() {
       println(cameras[i]);
     }
   }
+}
+void debugROI(String s) {
+  if ( debug) {
+    println( s + " ROI:   " + ROI.x + " " + ROI.y + " " + ROI.width+ " " + ROI.height );
+    println( s + " found: " + foundROI.x + " " + foundROI.y + " " + foundROI.width+ " " +foundROI.height );
+  }
+}
+
+PImage trans2( PImage img ) {
+  OpenCV newopencv;
+  if ( false ) return img;
+
+  newopencv = new OpenCV(this, img, useColor); // don't use color
+  newopencv.blur(5);
+
+  return newopencv.getSnapshot();
 }
 
