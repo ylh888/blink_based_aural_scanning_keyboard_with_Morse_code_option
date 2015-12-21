@@ -108,10 +108,10 @@ Rectangle roiLeft = new Rectangle(0, 0, 0, 0);
 Rectangle roiRight = new Rectangle(0, 0, 0, 0);
 PImage IMsource, IMnormal, IMyes, IMno; 
 
-int  screenWidth = 1240;
-int  screenHeight = 880;
-int camWidth = 360;
-int camHeight = 256;
+int screenWidth = 1240;
+int screenHeight = 880;
+int camWidth = 80;//360;
+int camHeight = 64;//256;
 
 // translating coordinates to here
 int offsetX = 300, offsetY = 300;
@@ -167,7 +167,7 @@ void setup() {
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
   } else {
-    video = new Capture(this, "name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
+    video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
   }
 
   opencv = new OpenCV(this, 640/SCALE, 480/SCALE);
@@ -265,12 +265,9 @@ void keyPressed() {
   case 1:
     stroke(0);
     IMnormal = get( (SCALE*foundROI.x)+ offsetX, (SCALE*foundROI.y) + offsetY, SCALE*foundROI.width, SCALE*foundROI.height);
-    if ( useOldcode ) {
-      IMnormal.save("normal.jpg");
-    } else {
-      IMsource = trans2( IMnormal );
-      IMsource.save("normal.jpg");
-    }
+    IMsource = trans2( IMnormal );
+    IMsource.save("normal.jpg");
+
     opencv2 = new OpenCV(this, "normal.jpg", useColor);
     opencv2.setGray(opencv2.getR().clone());
     Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
@@ -281,12 +278,9 @@ void keyPressed() {
   case 2:
     stroke(0);
     IMnormal = get( SCALE*foundROI.x+offsetX, SCALE*foundROI.y+offsetY, SCALE*foundROI.width, SCALE*foundROI.height);
-    if ( useOldcode ) {
-      IMnormal.save("yes.jpg");
-    } else {
-      IMsource = trans2( IMnormal ); 
-      IMsource.save("yes.jpg");
-    }
+    IMsource = trans2( IMnormal ); 
+    IMsource.save("yes.jpg");
+
     opencv2 = new OpenCV(this, "yes.jpg", useColor);
     opencv2.setGray(opencv2.getR().clone());
     Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
@@ -296,14 +290,9 @@ void keyPressed() {
   case 3:
     stroke(0);
     IMnormal = get( SCALE*foundROI.x+offsetX, SCALE*foundROI.y+offsetY, SCALE*foundROI.width, SCALE*foundROI.height );
+    IMsource = trans2( IMnormal ); 
+    IMsource.save("no.jpg");
 
-    //IMnormal = get(ROI.x, ROI.y, ROI.width, ROI.height);
-    if ( useOldcode ) {
-      IMnormal.save("no.jpg");
-    } else {
-      IMsource = trans2( IMnormal ); 
-      IMsource.save("no.jpg");
-    }
     opencv2 = new OpenCV(this, "no.jpg", useColor);
     opencv2.setGray(opencv2.getR().clone());
     Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
@@ -419,10 +408,10 @@ void doPhase5() {
   displayBuffer();
 
   if ( useOldcode) {
-    
+
     IMnormal = get(foundROI.x+offsetX, foundROI.y + offsetY, foundROI.width, foundROI.height);
-    image( IMnormal, -300,-300 );
-    
+    image( IMnormal, -300, -300 );
+
     opencv.releaseROI();
     opencv.setROI(foundROI.x, foundROI.y, foundROI.width, foundROI.height);
     debugROI("5old");
@@ -430,26 +419,17 @@ void doPhase5() {
     opencv.releaseROI();
     //opencv.setGray(Mroi);
   } else {
-    
-    debugROI("5");
+
+    // debugROI("5");
     IMnormal = get(foundROI.x+offsetX, foundROI.y+offsetY, foundROI.width, foundROI.height);
-    image( IMnormal, -IMnormal.width, 0);
+    //image( IMnormal, -IMnormal.width, 0);
     IMsource = trans2( IMnormal ); 
-    image( IMsource, -IMnormal.width, IMnormal.height) ; 
-    if (debug) {
-      println("5imange:" +IMsource.width+" "+IMsource.height);
-    }
-    /*
-    PImage retImg = trans2( IMsource );
-    opencv = new OpenCV(this, retImg );
-    //opencv.setROI( foundROI.x, foundROI.y, foundROI.width, foundROI.height);
-    opencv.releaseROI();
-    opencv.setROI(foundROI.x, foundROI.y, foundROI.width, foundROI.height);
-    Mroi = opencv.getROI().clone(); 
-     */
-    
+    image( IMsource, -IMnormal.width, 0) ; 
+
+    //  println("5imange:" +IMsource.width+" "+IMsource.height);
+
     opencv = new OpenCV( this, IMsource );
-    opencv.setROI(0,0,IMsource.width, IMsource.height);
+    opencv.setROI(0, 0, IMsource.width, IMsource.height);
     Mroi = opencv.getROI().clone(); 
     opencv.releaseROI();
     //opencv.setGray(Mroi);
@@ -464,15 +444,24 @@ void doPhase5() {
   Mat noRes = new Mat();  
   Imgproc.matchTemplate(Mroi, noMat, noRes, Imgproc.TM_CCORR_NORMED);
   if ( debug ) {
-    println( "normal=" + Core.minMaxLoc(normalRes).maxVal + " yes=" + Core.minMaxLoc(yesRes).maxVal +" no=" + Core.minMaxLoc(noRes).maxVal);
+    println( "normal=" + nf((float)Core.minMaxLoc(normalRes).maxVal, 0, 2)
+      + " yes=" + nf((float)Core.minMaxLoc(yesRes).maxVal, 0, 2) 
+      + " no=" + nf((float)Core.minMaxLoc(noRes).maxVal, 0, 2));
   }
 
   if ( Core.minMaxLoc(yesRes).maxVal > 0.7 && 
     ( Core.minMaxLoc(yesRes).maxVal > Core.minMaxLoc(normalRes).maxVal ) &&
     ( Core.minMaxLoc(yesRes).maxVal > Core.minMaxLoc(noRes).maxVal )  ) {
 
+    if (debug) {
+      fill(255, 0, 0);
+      textSize(16);
+      text( "normal=" + nf((float)Core.minMaxLoc(normalRes).maxVal, 0, 2)
+        + " yes=" + nf((float)Core.minMaxLoc(yesRes).maxVal, 0, 2) 
+        + " no=" + nf((float)Core.minMaxLoc(noRes).maxVal, 0, 2), -IMsource.width, -40 );
+    }  
     // MARK
-    selected = 1;  // yes
+    selected = 1;  // yes1
     fill(0, 0, 255);
     rect(foundROI.x, foundROI.y, foundROI.width, foundROI.height); 
     noFill();
@@ -594,7 +583,7 @@ void doPhase2() {
   stroke( 0, 0, 255);
   rect(  foundROI.x-2, foundROI.y-2, foundROI.width+4, foundROI.height+4 );
 
-  debugROI("2");
+  //debugROI("2");
 }
 
 void doPhase1() {
@@ -697,7 +686,7 @@ void displayBuffer() {
   fill(255, 0, 0);
   textSize(30);
 
-  text( buffer.toUpperCase().replaceAll(" ", "_"), 10, 66 );
+  text( buffer.toUpperCase().replaceAll(" ", "_"), 10, -66 );
 
   textSize(16);
   if ( voiceon) {
@@ -1031,11 +1020,9 @@ void debugROI(String s) {
 
 PImage trans2( PImage img ) {
   OpenCV newopencv;
-  if ( false ) return img;
 
   newopencv = new OpenCV(this, img, useColor); // don't use color
-  newopencv.blur(5);
-
+  newopencv.blur(10);
   return newopencv.getSnapshot();
 }
 
