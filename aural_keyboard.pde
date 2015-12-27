@@ -33,7 +33,7 @@ boolean testing = false;  // jump to new code in 'test'
 boolean useOldcode = false; // testing fragments
 
 boolean useWebcam = false; // use webcam (true) or eye cam (false)
-boolean debug = true;
+boolean debug = false;
 boolean useColor = false;
 boolean useGoogle = false;
 
@@ -110,8 +110,6 @@ PImage IMsource, IMnormal, IMyes, IMno;
 
 int screenWidth = 1240;
 int screenHeight = 880;
-int camWidth = 80;//360;
-int camHeight = 64;//256;
 
 // translating coordinates to here
 int offsetX = 300, offsetY = 300;
@@ -120,6 +118,14 @@ int offsetX = 300, offsetY = 300;
 Histogram normalHist, yesHist, sourceHist;
 Mat normalMat, yesMat, noMat, sourceMat, Mroi, normalRes, yesRes, noRes;
 int selected = 0;
+
+// below for eye camera use (see test_borescope.pde)
+// i.e. useWebcam == false
+int camWidth = 160;
+int camHeight = 120;// 128;
+PImage[] imL;
+Mat[] matL;
+Mat[] res;
 
 void setup() {
 
@@ -149,31 +155,43 @@ void setup() {
 
   String[] cameras = Capture.list();
 
-  if (cameras.length == 0) {
-    println("There are no cameras available for capture.");
-    exit();
-  } else {
-    println("Available cameras:");
-    for (int i = 0; i < cameras.length; i++) {
-      print(i); 
-      print(": ");
-      println(cameras[i]);
+  if ( debug) {
+    if (cameras.length == 0) {
+      println("There are no cameras available for capture.");
+      exit();
+    } else {
+      println("Available cameras:");
+      for (int i = 0; i < cameras.length; i++) {
+        print(i); 
+        print(": ");
+        println(cameras[i]);
+      }
+      // The camera can be initialized directly using an 
+      // element from the array returned by list():
+      //cam = new Capture(this, cameras[12]);
+      //cam.start();
     }
-    // The camera can be initialized directly using an 
-    // element from the array returned by list():
-    //cam = new Capture(this, cameras[12]);
-    //cam.start();
-  }    
+  }
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
   } else {
-    video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
+    // video = new Capture(this, "name=USB 2.0 Camera,size="
+    video = new Capture(this, "name=USB 2.0 PC Cam,size="
+      + camWidth + "x" 
+      + camHeight + ",fps=30" );  // using alternate camera
+    // video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
   }
 
   opencv = new OpenCV(this, 640/SCALE, 480/SCALE);
   //opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE); 
   opencv.loadCascade( OpenCV.CASCADE_EYE );
   opencv.useGray(); 
+
+  if ( useWebcam == false ) {
+    matL = new Mat[10];
+    res = new Mat[10];
+    imL = new PImage[10];
+  }
 
   video.start();
 
@@ -262,48 +280,67 @@ void keyPressed() {
     //type(key);
     //doAlpine();
     break;
-  case 1:
+  case 1:  // in phase 1, therefore '2' is pressed
     stroke(0);
+
     IMnormal = get( (SCALE*foundROI.x)+ offsetX, (SCALE*foundROI.y) + offsetY, SCALE*foundROI.width, SCALE*foundROI.height);
-    IMsource = trans2( IMnormal );
-    IMsource.save("normal.jpg");
+    if ( useWebcam ) {
+      IMsource = trans2( IMnormal );
+      IMsource.save("normal.jpg");
 
-    opencv2 = new OpenCV(this, "normal.jpg", useColor);
-    opencv2.setGray(opencv2.getR().clone());
-    Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
-    normalMat = opencv2.getGray();
-
+      opencv2 = new OpenCV(this, "normal.jpg", useColor);
+      opencv2.setGray(opencv2.getR().clone());
+      Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
+      normalMat = opencv2.getGray();
+    } else {
+      IMsource = get( SCALE*ROI.x+offsetX, SCALE*ROI.y+offsetY, SCALE*ROI.width, SCALE*ROI.height );
+      IMsource.save("normal.jpg");
+      process(0, IMsource);
+    }
     phase = 2;  
     break;
-  case 2:
+  case 2:  // in phase 2 therefore '3' is pressed
     stroke(0);
     IMnormal = get( SCALE*foundROI.x+offsetX, SCALE*foundROI.y+offsetY, SCALE*foundROI.width, SCALE*foundROI.height);
-    IMsource = trans2( IMnormal ); 
-    IMsource.save("yes.jpg");
+    if ( useWebcam ) {
+      IMsource = trans2( IMnormal ); 
+      IMsource.save("yes.jpg");
 
-    opencv2 = new OpenCV(this, "yes.jpg", useColor);
-    opencv2.setGray(opencv2.getR().clone());
-    Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
-    yesMat = opencv2.getGray();
+      opencv2 = new OpenCV(this, "yes.jpg", useColor);
+      opencv2.setGray(opencv2.getR().clone());
+      Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
+      yesMat = opencv2.getGray();
+    } else {
+      IMsource = get( SCALE*ROI.x+offsetX, SCALE*ROI.y+offsetY, SCALE*ROI.width, SCALE*ROI.height );
+      IMsource.save("yes.jpg");
+      process(1, IMsource);
+    }
     phase = 3;  
     break;
   case 3:
     stroke(0);
     IMnormal = get( SCALE*foundROI.x+offsetX, SCALE*foundROI.y+offsetY, SCALE*foundROI.width, SCALE*foundROI.height );
-    IMsource = trans2( IMnormal ); 
-    IMsource.save("no.jpg");
 
-    opencv2 = new OpenCV(this, "no.jpg", useColor);
-    opencv2.setGray(opencv2.getR().clone());
-    Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
-    noMat = opencv2.getGray();
+    if ( useWebcam) {
+      IMsource = trans2( IMnormal ); 
+      IMsource.save("no.jpg");
 
-    /* changed
-     foundROI.x-=10; 
-     foundROI.y-=10; 
-     foundROI.width +=20;
-     foundROI.height+=20;
-     */
+      opencv2 = new OpenCV(this, "no.jpg", useColor);
+      opencv2.setGray(opencv2.getR().clone());
+      Imgproc.morphologyEx(opencv2.getGray(), opencv2.getGray(), Imgproc.MORPH_GRADIENT, new Mat());
+      noMat = opencv2.getGray();
+
+      /* changed
+       foundROI.x-=10; 
+       foundROI.y-=10; 
+       foundROI.width +=20;
+       foundROI.height+=20;
+       */
+    } else {
+      IMsource = get( SCALE*ROI.x+offsetX, SCALE*ROI.y+offsetY, SCALE*ROI.width, SCALE*ROI.height );
+      IMsource.save("no.jpg");
+      process(2, IMsource);
+    }
     phase = 4;  
     break;
   case 4:
@@ -393,11 +430,6 @@ void doPhase5() {
   opencv.loadImage(video);
   image(video, 0, 0 );
 
-  noFill();
-  strokeWeight(1);
-  stroke(0, 255, 0);
-  rect(foundROI.x, foundROI.y, foundROI.width, foundROI.height); 
-
 
   fill(0, 0, 0); 
   stroke(0, 0, 0);
@@ -407,46 +439,92 @@ void doPhase5() {
   showInstruction();
   displayBuffer();
 
-  if ( useOldcode) {
+  if (useWebcam) {
+    noFill();
+    strokeWeight(1);
+    stroke(0, 255, 0);
+    rect(foundROI.x, foundROI.y, foundROI.width, foundROI.height); 
 
-    IMnormal = get(foundROI.x+offsetX, foundROI.y + offsetY, foundROI.width, foundROI.height);
-    image( IMnormal, -300, -300 );
+    if ( useOldcode) {
 
-    opencv.releaseROI();
-    opencv.setROI(foundROI.x, foundROI.y, foundROI.width, foundROI.height);
-    debugROI("5old");
+      IMnormal = get(foundROI.x+offsetX, foundROI.y + offsetY, foundROI.width, foundROI.height);
+      image( IMnormal, -300, -300 );
+
+      opencv.releaseROI();
+      opencv.setROI(foundROI.x, foundROI.y, foundROI.width, foundROI.height);
+      debugROI("5old");
+      Mroi = opencv.getROI().clone(); 
+      opencv.releaseROI();
+      //opencv.setGray(Mroi);
+    } else {
+
+      // debugROI("5");
+      IMnormal = get(foundROI.x+offsetX, foundROI.y+offsetY, foundROI.width, foundROI.height);
+      //image( IMnormal, -IMnormal.width, 0);
+      IMsource = trans2( IMnormal ); 
+      image( IMsource, -IMnormal.width, 0) ; 
+
+      //  println("5imange:" +IMsource.width+" "+IMsource.height);
+
+      opencv = new OpenCV( this, IMsource );
+      opencv.setROI(0, 0, IMsource.width, IMsource.height);
+      Mroi = opencv.getROI().clone(); 
+      opencv.releaseROI();
+      //opencv.setGray(Mroi);
+    }
+
+    Imgproc.morphologyEx(Mroi, Mroi, Imgproc.MORPH_GRADIENT, new Mat());
+
+    normalRes = new Mat();  
+    Imgproc.matchTemplate(Mroi, normalMat, normalRes, Imgproc.TM_CCORR_NORMED);
+    yesRes = new Mat();  
+    Imgproc.matchTemplate(Mroi, yesMat, yesRes, Imgproc.TM_CCORR_NORMED);
+    noRes = new Mat();  
+    Imgproc.matchTemplate(Mroi, noMat, noRes, Imgproc.TM_CCORR_NORMED);
+    if ( debug ) {
+      println( "normal=" + nf((float)Core.minMaxLoc(normalRes).maxVal, 0, 2)
+        + " yes=" + nf((float)Core.minMaxLoc(yesRes).maxVal, 0, 2) 
+        + " no=" + nf((float)Core.minMaxLoc(noRes).maxVal, 0, 2));
+    }
+  } else { // use eye cam
+    //IMnormal = loadImage( "normal.jpg" );
+    image( IMnormal, camWidth, 0 );
+    image( imL[0], camWidth, camHeight );
+    //IMyes = loadImage( "yes.jpg" );
+    image( IMyes, camWidth*2, 0 );
+    image( imL[1], camWidth*2, camHeight );
+    //IMno = loadImage( "no.jpg" );
+    image( IMno, camWidth*3, 0 );
+    image( imL[2], camWidth*3, camHeight );
+
+    PImage IMcurrent = get(foundROI.x+offsetX, foundROI.y + offsetY, foundROI.width, foundROI.height);
+    PImage procCurrent = process( 3, IMcurrent );
+    Mroi = matL[3];
+    image( procCurrent, 0, camHeight );
+
+    opencv = new OpenCV( this, IMcurrent );
+    opencv.setROI(0, 0, IMcurrent.width, IMcurrent.height);
     Mroi = opencv.getROI().clone(); 
     opencv.releaseROI();
-    //opencv.setGray(Mroi);
-  } else {
 
-    // debugROI("5");
-    IMnormal = get(foundROI.x+offsetX, foundROI.y+offsetY, foundROI.width, foundROI.height);
-    //image( IMnormal, -IMnormal.width, 0);
-    IMsource = trans2( IMnormal ); 
-    image( IMsource, -IMnormal.width, 0) ; 
+    for (int i=0; i<3; i++) { 
+      res[i] = new Mat();
+      Imgproc.matchTemplate(Mroi, matL[i], res[i], Imgproc.TM_CCORR_NORMED);
 
-    //  println("5imange:" +IMsource.width+" "+IMsource.height);
+      noFill();
+      stroke(0, 255, 0);
+      strokeWeight(1);
+      rect( OpenCV.pointToPVector(Core.minMaxLoc(res[i]).maxLoc).x + camWidth*(i+1), 
+      OpenCV.pointToPVector(Core.minMaxLoc(res[i]).maxLoc).y + camHeight, foundROI.width, 
+      foundROI.height );
 
-    opencv = new OpenCV( this, IMsource );
-    opencv.setROI(0, 0, IMsource.width, IMsource.height);
-    Mroi = opencv.getROI().clone(); 
-    opencv.releaseROI();
-    //opencv.setGray(Mroi);
-  }
+      fill( 255, 0, 0 );
+      text( nf((float)Core.minMaxLoc(res[i]).maxVal, 0, 2), camWidth*(i+1) + 20, camHeight*2 - 15);
+    }
 
-  Imgproc.morphologyEx(Mroi, Mroi, Imgproc.MORPH_GRADIENT, new Mat());
-
-  Mat normalRes = new Mat();  
-  Imgproc.matchTemplate(Mroi, normalMat, normalRes, Imgproc.TM_CCORR_NORMED);
-  Mat yesRes = new Mat();  
-  Imgproc.matchTemplate(Mroi, yesMat, yesRes, Imgproc.TM_CCORR_NORMED);
-  Mat noRes = new Mat();  
-  Imgproc.matchTemplate(Mroi, noMat, noRes, Imgproc.TM_CCORR_NORMED);
-  if ( debug ) {
-    println( "normal=" + nf((float)Core.minMaxLoc(normalRes).maxVal, 0, 2)
-      + " yes=" + nf((float)Core.minMaxLoc(yesRes).maxVal, 0, 2) 
-      + " no=" + nf((float)Core.minMaxLoc(noRes).maxVal, 0, 2));
+    normalRes = res[0];
+    yesRes = res[1];
+    noRes = res[2];
   }
 
   if ( Core.minMaxLoc(yesRes).maxVal > 0.7 && 
@@ -458,7 +536,7 @@ void doPhase5() {
       textSize(16);
       text( "normal=" + nf((float)Core.minMaxLoc(normalRes).maxVal, 0, 2)
         + " yes=" + nf((float)Core.minMaxLoc(yesRes).maxVal, 0, 2) 
-        + " no=" + nf((float)Core.minMaxLoc(noRes).maxVal, 0, 2), -IMsource.width, -40 );
+        + " no=" + nf((float)Core.minMaxLoc(noRes).maxVal, 0, 2), -IMnormal.width, -40 );
     }  
     // MARK
     selected = 1;  // yes1
@@ -533,19 +611,30 @@ void doPhase5() {
 void doPhase4() {
   stroke(0, 255, 0);
   image(video, 0, 0 );
+  showInstruction();  
 
-  IMnormal = loadImage( "normal.jpg");
-  image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
-  IMyes = loadImage( "yes.jpg");
-  image( IMyes, - IMnormal.width, IMnormal.height ) ; //image( IMyes, 0, IMnormal.height);
-  IMno = loadImage( "no.jpg");
-  image( IMno, - IMnormal.width, IMnormal.height+IMyes.height ) ; //image( IMno, 0, IMnormal.height+IMyes.height);
-  stroke(0, 255, 0);
-  rect(ROI.x, ROI.y, ROI.width, ROI.height);
-  stroke( 0, 0, 255);
-  rect(  foundROI.x, foundROI.y, foundROI.width, foundROI.height );
-
-  showInstruction();
+  if ( useWebcam) {
+    IMnormal = loadImage( "normal.jpg");
+    image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
+    IMyes = loadImage( "yes.jpg");
+    image( IMyes, - IMnormal.width, IMnormal.height ) ; //image( IMyes, 0, IMnormal.height);
+    IMno = loadImage( "no.jpg");
+    image( IMno, - IMnormal.width, IMnormal.height+IMyes.height ) ; //image( IMno, 0, IMnormal.height+IMyes.height);
+    stroke(0, 255, 0);
+    rect(ROI.x, ROI.y, ROI.width, ROI.height);
+    stroke( 0, 0, 255);
+    rect(  foundROI.x, foundROI.y, foundROI.width, foundROI.height );
+  } else {
+    IMnormal = loadImage( "normal.jpg");
+    image( IMnormal, camWidth, 0 );
+    image( imL[0], camWidth, camHeight );
+    IMyes = loadImage( "yes.jpg" );
+    image( IMyes, camWidth*2, 0 );
+    image( imL[1], camWidth*2, camHeight );
+    IMno = loadImage( "no.jpg" );
+    image( IMno, camWidth*3, 0 );
+    image( imL[2], camWidth*3, camHeight );
+  }
 
   lastPresented = millis();
   presented = false;
@@ -556,33 +645,43 @@ void doPhase4() {
 void doPhase3() {
   stroke(0, 255, 0);
   image(video, 0, 0 );
-
-  IMnormal = loadImage( "normal.jpg");
-  image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
-  IMyes = loadImage( "yes.jpg");
-  image( IMyes, - IMnormal.width, IMnormal.height ) ; // image( IMyes, 0, IMnormal.height);
-  stroke(0, 255, 0);
-  rect(ROI.x, ROI.y, ROI.width, ROI.height);
-
   showInstruction();
 
-  stroke( 0, 0, 255);
-  rect(  foundROI.x-2, foundROI.y-2, foundROI.width+4, foundROI.height+4 );
+  IMnormal = loadImage( "normal.jpg");
+  if ( useWebcam ) {
+    image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
+    IMyes = loadImage( "yes.jpg");
+    image( IMyes, - IMnormal.width, IMnormal.height ) ; // image( IMyes, 0, IMnormal.height);
+    stroke(0, 255, 0);
+    rect(ROI.x, ROI.y, ROI.width, ROI.height);
+    stroke( 0, 0, 255);
+    rect(  foundROI.x-2, foundROI.y-2, foundROI.width+4, foundROI.height+4 );
+  } else {
+    image( IMnormal, camWidth, 0 );
+    image( imL[0], camWidth, camHeight );
+    IMyes = loadImage( "yes.jpg" );
+    image( IMyes, camWidth*2, 0 );
+    image( imL[1], camWidth*2, camHeight );
+  }
 }
-
 void doPhase2() {
 
   image(video, 0, 0 );
   showInstruction();
   IMnormal = loadImage( "normal.jpg");
-  image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
 
-  stroke(0, 255, 0);
-  rect(ROI.x, ROI.y, ROI.width, ROI.height);
+  if (useWebcam) {
+    image( IMnormal, - IMnormal.width, 0 ) ; //image( IMnormal, 0, 0);
 
-  stroke( 0, 0, 255);
-  rect(  foundROI.x-2, foundROI.y-2, foundROI.width+4, foundROI.height+4 );
+    stroke(0, 255, 0);
+    rect(ROI.x, ROI.y, ROI.width, ROI.height);
 
+    stroke( 0, 0, 255);
+    rect(  foundROI.x-2, foundROI.y-2, foundROI.width+4, foundROI.height+4 );
+  } else {
+    image( IMnormal, camWidth, 0 );
+    image( imL[0], camWidth, camHeight );
+  }
   //debugROI("2");
 }
 
@@ -604,7 +703,6 @@ void doPhase1() {
       if (debug) println( "1: " + foundROI.x + " " + foundROI.y + " " + foundROI.width+ " " +foundROI.height );
     }
   } else {
-    // assume using 80x64
     ROI.x = 0;
     ROI.y = 0;
     ROI.width = camWidth;
@@ -1024,5 +1122,36 @@ PImage trans2( PImage img ) {
   newopencv = new OpenCV(this, img, useColor); // don't use color
   newopencv.blur(10);
   return newopencv.getSnapshot();
+}
+
+// process image i
+// sets two globals imL[i] and matL[i]
+PImage process(int i, PImage inputImg) {
+  PImage retImg;
+  OpenCV ocv;
+  //retImg = get( i*wd, 0, wd, ht);
+  ocv = new OpenCV( this, inputImg, false );
+
+  ocv.equalizeHistogram();
+
+  //ocv.invert();
+  ocv.contrast(1.6);
+  //ocv.threshold(128);
+  //ocv.dilate();
+  //ocv.erode();
+
+  //ocv.findSobelEdges(0,1);
+  //ocv.invert();
+  //ocv.blur(5);
+
+  //image( inputImg, i*camWidth, camHeight, inputImg.width, inputImg.height  );
+  imL[i] = ocv.getSnapshot();
+
+  ocv = new OpenCV( this, imL[i] );
+  ocv.setROI(0, 0, imL[i].width, imL[i].height);
+  matL[i]= ocv.getROI().clone(); 
+  ocv.releaseROI();
+
+  return imL[i];
 }
 
