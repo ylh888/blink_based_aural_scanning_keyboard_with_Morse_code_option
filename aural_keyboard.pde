@@ -175,10 +175,10 @@ void setup() {
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
   } else {
-    // video = new Capture(this, "name=USB 2.0 Camera,size="
-    video = new Capture(this, "name=USB 2.0 PC Cam,size="
+    //1video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
+    video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
       + camWidth + "x" 
-      + camHeight + ",fps=30" );  // using alternate camera
+      + camHeight + ",fps=30" ); 
     // video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
   }
 
@@ -527,7 +527,7 @@ void doPhase5() {
     noRes = res[2];
   }
 
-  if ( Core.minMaxLoc(yesRes).maxVal > 0.7 && 
+  if ( Core.minMaxLoc(yesRes).maxVal > 0.6 && 
     ( Core.minMaxLoc(yesRes).maxVal > Core.minMaxLoc(normalRes).maxVal ) &&
     ( Core.minMaxLoc(yesRes).maxVal > Core.minMaxLoc(noRes).maxVal )  ) {
 
@@ -560,7 +560,7 @@ void doPhase5() {
     }
   } else { 
     // NOT MARK
-    if ( Core.minMaxLoc(noRes).maxVal > 0.7 && 
+    if ( Core.minMaxLoc(noRes).maxVal > 0.6 && 
       ( Core.minMaxLoc(noRes).maxVal > Core.minMaxLoc(normalRes).maxVal ) &&
       ( Core.minMaxLoc(noRes).maxVal > Core.minMaxLoc(yesRes).maxVal )  ) {
 
@@ -1135,7 +1135,7 @@ PImage process(int i, PImage inputImg) {
   ocv.equalizeHistogram();
 
   //ocv.invert();
-  ocv.contrast(1.6);
+  ocv.contrast(1.3);
   //ocv.threshold(128);
   //ocv.dilate();
   //ocv.erode();
