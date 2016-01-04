@@ -70,7 +70,7 @@ String[] textlines = new String[MaxLines+1];
 int currentLine = 0;
 
 
-final int FRAME_RATE = 10; // normal running frame rate to return to, from slower resting state
+final int FRAME_RATE = 15; // normal running frame rate to return to, from slower resting state
 
 int units = 400;  // morse units
 final int seconds = 1000;
@@ -153,31 +153,14 @@ void setup() {
   buzzDot = new Buzzer( 800, 0.1 ); 
   buzzAlarm = new Buzzer( 1200, 0.8 );  
 
-  String[] cameras = Capture.list();
+  if ( debug ) ListCameras();
 
-  if ( debug) {
-    if (cameras.length == 0) {
-      println("There are no cameras available for capture.");
-      exit();
-    } else {
-      println("Available cameras:");
-      for (int i = 0; i < cameras.length; i++) {
-        print(i); 
-        print(": ");
-        println(cameras[i]);
-      }
-      // The camera can be initialized directly using an 
-      // element from the array returned by list():
-      //cam = new Capture(this, cameras[12]);
-      //cam.start();
-    }
-  }
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
   } else {
-    //1video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
+    //video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
     video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
-      + camWidth + "x" 
+    + camWidth + "x" 
       + camHeight + ",fps=30" ); 
     // video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
   }
@@ -456,6 +439,17 @@ void doPhase5() {
       Mroi = opencv.getROI().clone(); 
       opencv.releaseROI();
       //opencv.setGray(Mroi);
+
+      // bad use of morphology
+      Imgproc.morphologyEx(Mroi, Mroi, Imgproc.MORPH_GRADIENT, new Mat());
+
+      normalRes = new Mat();  
+      //inverted template/image to search
+      Imgproc.matchTemplate(Mroi, normalMat, normalRes, Imgproc.TM_CCORR_NORMED);
+      yesRes = new Mat();  
+      Imgproc.matchTemplate(Mroi, yesMat, yesRes, Imgproc.TM_CCORR_NORMED);
+      noRes = new Mat();  
+      Imgproc.matchTemplate(Mroi, noMat, noRes, Imgproc.TM_CCORR_NORMED);
     } else {
 
       // debugROI("5");
@@ -471,16 +465,18 @@ void doPhase5() {
       Mroi = opencv.getROI().clone(); 
       opencv.releaseROI();
       //opencv.setGray(Mroi);
+      // DO NOT USE morphology
+      //Imgproc.morphologyEx(Mroi, Mroi, Imgproc.MORPH_GRADIENT, new Mat());
+
+      normalRes = new Mat();  
+      Imgproc.matchTemplate(normalMat, Mroi, normalRes, Imgproc.TM_CCORR_NORMED);
+      yesRes = new Mat();  
+      Imgproc.matchTemplate(yesMat, Mroi, yesRes, Imgproc.TM_CCORR_NORMED);
+      noRes = new Mat();  
+      Imgproc.matchTemplate(noMat, Mroi, noRes, Imgproc.TM_CCORR_NORMED);
     }
 
-    Imgproc.morphologyEx(Mroi, Mroi, Imgproc.MORPH_GRADIENT, new Mat());
 
-    normalRes = new Mat();  
-    Imgproc.matchTemplate(Mroi, normalMat, normalRes, Imgproc.TM_CCORR_NORMED);
-    yesRes = new Mat();  
-    Imgproc.matchTemplate(Mroi, yesMat, yesRes, Imgproc.TM_CCORR_NORMED);
-    noRes = new Mat();  
-    Imgproc.matchTemplate(Mroi, noMat, noRes, Imgproc.TM_CCORR_NORMED);
     if ( debug ) {
       println( "normal=" + nf((float)Core.minMaxLoc(normalRes).maxVal, 0, 2)
         + " yes=" + nf((float)Core.minMaxLoc(yesRes).maxVal, 0, 2) 
@@ -502,14 +498,17 @@ void doPhase5() {
     Mroi = matL[3];
     image( procCurrent, 0, camHeight );
 
-    opencv = new OpenCV( this, IMcurrent );
+    opencv = new OpenCV( this, procCurrent );
     opencv.setROI(0, 0, IMcurrent.width, IMcurrent.height);
     Mroi = opencv.getROI().clone(); 
     opencv.releaseROI();
 
     for (int i=0; i<3; i++) { 
       res[i] = new Mat();
-      Imgproc.matchTemplate(Mroi, matL[i], res[i], Imgproc.TM_CCORR_NORMED);
+      Imgproc.matchTemplate(matL[i], Mroi, res[i], Imgproc.TM_CCORR_NORMED);
+      //Imgproc.matchTemplate(matL[i], Mroi, res[i], Imgproc.TM_CCOEFF_NORMED);
+
+      //Imgproc.matchTemplate(matL[i], Mroi, res[i], Imgproc.TM_SQDIFF);
 
       noFill();
       stroke(0, 255, 0);
@@ -526,6 +525,12 @@ void doPhase5() {
     yesRes = res[1];
     noRes = res[2];
   }
+
+  /*
+  if ( Core.minMaxLoc(yesRes).minVal < 0.5 && 
+   ( Core.minMaxLoc(yesRes).minVal < Core.minMaxLoc(normalRes).minVal ) &&
+   ( Core.minMaxLoc(yesRes).minVal < Core.minMaxLoc(noRes).minVal )  ) {
+   //*/
 
   if ( Core.minMaxLoc(yesRes).maxVal > 0.6 && 
     ( Core.minMaxLoc(yesRes).maxVal > Core.minMaxLoc(normalRes).maxVal ) &&
@@ -695,7 +700,6 @@ void doPhase1() {
     ROI.height = 240;
     ROI.x = 320/SCALE; // left eye
     ROI.y = 240/SCALE - ROI.height/SCALE/2; 
-    //showInstruction();
 
     boolean found = findEye( ROI );
 
@@ -711,12 +715,10 @@ void doPhase1() {
     foundROI.y = 10;
     foundROI.width = camWidth - 20;
     foundROI.height = camHeight - 20;
-    //showInstruction();
   }
 }
 
 boolean findEye( Rectangle roi ) {
-
 
   noFill();
   strokeWeight(1);
@@ -1120,7 +1122,7 @@ PImage trans2( PImage img ) {
   OpenCV newopencv;
 
   newopencv = new OpenCV(this, img, useColor); // don't use color
-  newopencv.blur(10);
+  newopencv.blur(1);
   return newopencv.getSnapshot();
 }
 
@@ -1134,20 +1136,33 @@ PImage process(int i, PImage inputImg) {
 
   ocv.equalizeHistogram();
 
-  //ocv.invert();
   ocv.contrast(1.3);
+  //ocv.invert();
+
   //ocv.threshold(128);
   //ocv.dilate();
   //ocv.erode();
+  // ocv.findCannyEdges(20,75);
 
   //ocv.findSobelEdges(0,1);
   //ocv.invert();
-  //ocv.blur(5);
+  // ocv.blur(1);
 
-  //image( inputImg, i*camWidth, camHeight, inputImg.width, inputImg.height  );
+  if ( false ) { // testing old code - don't preprocess if using this
+    Mat Mroi;
+    ocv.setROI(0, 0, inputImg.width, inputImg.height);
+    Mroi = ocv.getROI().clone();
+
+    Imgproc.morphologyEx(Mroi, Mroi, Imgproc.MORPH_GRADIENT, new Mat());
+
+    imL[i] = ocv.getSnapshot(); // just to initialize
+    ocv.toPImage( Mroi, imL[i] );
+    matL[i] = Mroi;
+    return imL[i];
+  }
+
   imL[i] = ocv.getSnapshot();
 
-  ocv = new OpenCV( this, imL[i] );
   ocv.setROI(0, 0, imL[i].width, imL[i].height);
   matL[i]= ocv.getROI().clone(); 
   ocv.releaseROI();

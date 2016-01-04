@@ -3,6 +3,7 @@
  from the file test_send_keys
  
  cf http://stackoverflow.com/questions/1248510/convert-string-to-keyevents
+ http://forum.codecall.net/topic/54172-robot-class/
  */
 
 Process mailProcess;
