@@ -124,7 +124,8 @@ void doCB() {
     case 444: // erase text buffer
       eraseBuffer();
       break;
-    case 5: // go to browser
+    case 5:
+       /*// go to browser
       if (voiceon) { // feedback
         i=menuObj.getJSONObject( curItem ).getInt("sound");
         sounds[i].play();
@@ -132,6 +133,7 @@ void doCB() {
       }
       doBrowser();
       mode = BROWSER;
+      */
       break;
     case 6: // go to email
       if (voiceon) { // feedback
@@ -139,8 +141,10 @@ void doCB() {
         sounds[i].play();
         sounds[i].rewind();
       }
+      /*
       doMail();
       mode = EMAIL;
+      */
       break;
     case 8:
       inputType = MORSE;

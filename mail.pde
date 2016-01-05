@@ -56,7 +56,7 @@ void switchToMail() {
   /*
   try {
    //Runtime.getRuntime().exec("/usr/bin/osascript -e 'tell application \"Safari\" to activate'");
-   Runtime.getRuntime().exec("open /Applications/Safari.app");
+  // Runtime.getRuntime().exec("open /Applications/Safari.app");
    delay(100);
    lastPresented = millis();
    } 
@@ -68,23 +68,25 @@ void switchToMail() {
 
 void launchMail() {
   //switchToMail();
-
+ /*
   try {
-    Runtime.getRuntime().exec("open /Applications/Safari.app");
-    println("run safari");
+    //Runtime.getRuntime().exec("open /Applications/Safari.app");
+    //println("run safari");
     //"open /Applications/Mail.app"); //("open /usr/bin/emacs");
     delay(100);
   } 
   catch (IOException ex) {
     println(ex.toString());
   }
+  */
 }
 
 void quitMail() {
   //MailRunning = false;
+  /*
   try {
     //Runtime.getRuntime().exec("/usr/bin/osascript -e 'tell application \"Terminal\" to exit'");
-    Runtime.getRuntime().exec("open /Applications/Safari.app");
+    //Runtime.getRuntime().exec("open /Applications/Safari.app");
     commandType("wq");
     println("QUIT_MAIL");
     delay(100);
@@ -92,6 +94,7 @@ void quitMail() {
   catch (IOException ex) {
     println(ex.toString());
   }
+  */
 }
 void shiftType(CharSequence chars) {
   //switchToMail(); 

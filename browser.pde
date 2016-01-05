@@ -5,8 +5,9 @@
 
 void doBrowser() {
   lastPresented = millis()+1000;
+  /*
   try {
-    Runtime.getRuntime().exec("open /Applications/Safari.app");
+    //Runtime.getRuntime().exec("open /Applications/Safari.app");
     delay(300);
     println("START_browser");
     
@@ -14,7 +15,7 @@ void doBrowser() {
   catch (IOException ex) {
     println(ex.toString());
   }
-  
+  */
 }
 /*
 void quitBrowser() {

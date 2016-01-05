@@ -36,6 +36,7 @@ boolean useWebcam = false; // use webcam (true) or eye cam (false)
 boolean debug = false;
 boolean useColor = false;
 boolean useGoogle = false;
+boolean useBrowser = false;
 
 // 0 - waiting; when both eyes closed, triggered alarmStartTime ->1
 // 1 && alarmStartTime > x msec, buzzAlarm.on -> 2
@@ -136,21 +137,21 @@ void setup() {
 
   textlines[0]="";
   /* test new fragments of speech here */
-  if ( false ) {
+  if ( false  ) {
     textlines[0] = "The quick brown fox jumps over the lazy dog";
     textlines[1] = "Please turn on the TV";
     textlines[2] = "Thank you";
-    currentLine = 3;
+    currentLine = 2;
     readIt();
-    if (true) return;
+    if (true) exit();
   }   
 
   //size(640, 480);
   size(screenWidth, screenHeight);
 
 
-  buzzDash = new Buzzer( 440, 0.05 );
-  buzzDot = new Buzzer( 800, 0.1 ); 
+  buzzDash = new Buzzer( 1000, 0.05 );
+  buzzDot = new Buzzer( 1200, 0.1 ); 
   buzzAlarm = new Buzzer( 1200, 0.8 );  
 
   if ( debug ) ListCameras();
@@ -839,15 +840,6 @@ void sayWords ( String s ) {
 }
 
 void readIt() {
-  if ( useGoogle ) {
-    readByGoogle();
-  } else {
-    readByEspeak();
-  }
-}
-
-// read text using espeak
-void readByEspeak() {
   String txt = "";
 
   for ( int i=0; i<=currentLine; i++ ) {
@@ -856,10 +848,23 @@ void readByEspeak() {
   pauseFor( 100*txt.length(), false);
   lastPresented = millis();
   lastPresented += 300*txt.length() + 5000; 
+  
+  if ( useGoogle ) {
+    readByGoogle(txt);
+  } else if ( useBrowser ) {
+    readByBrowser(txt);
+  } else {
+    readByEspeak(txt);
+  }
+}
+
+// read text using espeak
+void readByEspeak(String txt) {
 
   try {
     String[] args1 = {
-      "/usr/local/bin/speak", "-ven+f4", "-g 7", txt
+      //"/usr/local/bin/speak", "-ven+f4", "-g 7", txt
+      "say", "-v", "Samantha", txt
     };
     Runtime r = Runtime.getRuntime();
     Process p = r.exec(args1);
@@ -870,24 +875,33 @@ void readByEspeak() {
   }
 }
 
-void readByGoogle() {
-  String txt = "";
-
-  for ( int i=0; i<=currentLine; i++ ) {
-    txt += textlines[i] + "+";
-  }
-  txt = txt.replaceAll(" ", "+");
-
-  pauseFor( 100*txt.length(), false);
-  lastPresented = millis();
-  lastPresented += 300*txt.length() + 5000; 
+void readByBrowser(String txt) {
 
   try {
     String[] args1 = {
-      "curl", "-A ", "Mozilla", 
-      "http://translate.google.com/translate_tts?tl=en&q=" +
+      "open", "/Applications/Google Chrome.app", 
+      "file:///Users/ylh/0/node/blink/speak.html?txt=" +
         txt
     };
+    print("use speack syntheses: " + txt + "+++");
+    Runtime r = Runtime.getRuntime();
+    Process p = r.exec(args1);
+  }  
+  catch (IOException ex) {
+    println(ex.toString());
+  }
+}
+
+void readByGoogle(String txt) {
+
+  try {
+    String[] args1 = {
+
+      "curl", "-A ", "Mozilla", 
+      "https://translate.google.com/translate_tts?tl=en&q=" +
+        txt
+    };
+    println(txt);
     Runtime r = Runtime.getRuntime();
     Process p = r.exec(args1);
 
