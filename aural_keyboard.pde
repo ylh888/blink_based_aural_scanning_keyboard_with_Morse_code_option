@@ -66,7 +66,7 @@ int inputType = REGULAR;
 boolean MARK = false;
 
 // message store
-final int MaxLines = 20;
+final int MaxLines = 16;
 String[] textlines = new String[MaxLines+1];
 int currentLine = 0;
 
@@ -113,7 +113,7 @@ int screenWidth = 1240;
 int screenHeight = 880;
 
 // translating coordinates to here
-int offsetX = 300, offsetY = 300;
+int offsetX = 300, offsetY = 440;
 
 // variables
 Histogram normalHist, yesHist, sourceHist;
@@ -137,20 +137,20 @@ void setup() {
 
   textlines[0]="";
   /* test new fragments of speech here */
-  if ( false  ) {
+  if ( true  ) {
     textlines[0] = "The quick brown fox jumps over the lazy dog";
     textlines[1] = "Please turn on the TV";
     textlines[2] = "Thank you";
     currentLine = 2;
     readIt();
-    if (true) exit();
+    if (false) exit();
   }   
 
   //size(640, 480);
   size(screenWidth, screenHeight);
 
 
-  buzzDash = new Buzzer( 1000, 0.05 );
+  buzzDash = new Buzzer( 1000, 0.1 );
   buzzDot = new Buzzer( 1200, 0.1 ); 
   buzzAlarm = new Buzzer( 1200, 0.8 );  
 
@@ -159,8 +159,9 @@ void setup() {
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
   } else {
+    video = new Capture(this, "name=USB2.0_Camera,size="  //U cam webcam
     //video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
-    video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
+    //video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
     + camWidth + "x" 
       + camHeight + ",fps=30" ); 
     // video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
@@ -176,7 +177,6 @@ void setup() {
     res = new Mat[10];
     imL = new PImage[10];
   }
-
   video.start();
 
   /*
@@ -414,7 +414,6 @@ void doPhase5() {
   opencv.loadImage(video);
   image(video, 0, 0 );
 
-
   fill(0, 0, 0); 
   stroke(0, 0, 0);
   rect(0, 0, screenWidth, ROI.y); // blacken top
@@ -527,7 +526,7 @@ void doPhase5() {
     noRes = res[2];
   }
 
-  /*
+  /* if using another coefficient
   if ( Core.minMaxLoc(yesRes).minVal < 0.5 && 
    ( Core.minMaxLoc(yesRes).minVal < Core.minMaxLoc(normalRes).minVal ) &&
    ( Core.minMaxLoc(yesRes).minVal < Core.minMaxLoc(noRes).minVal )  ) {
@@ -547,7 +546,7 @@ void doPhase5() {
     // MARK
     selected = 1;  // yes1
     fill(0, 0, 255);
-    rect(foundROI.x, foundROI.y, foundROI.width, foundROI.height); 
+    rect(0, 0, foundROI.width, foundROI.height); 
     noFill();
     //noCount =0; // reset 
     //yesCount++;
@@ -572,6 +571,8 @@ void doPhase5() {
 
       // "No" - not used yet
       selected = 2; // no
+      
+      pauseFor( 60000, true );  // 'no' gesture means 60s pause
       /*
        fill(255, 0, 0);
        rect(foundROI.x, foundROI.y, foundROI.width, foundROI.height); 
@@ -692,6 +693,7 @@ void doPhase2() {
 }
 
 void doPhase1() {
+
   opencv.loadImage(video);
   image(video, 0, 0 );
   showInstruction();
@@ -752,9 +754,9 @@ void captureEvent(Capture c) {
 
 void displayText() {
   fill(0, 255, 0);
-  textSize(18);
+  textSize(24);
   int l=buffer.length();
-  if ( currentLine < MaxLines && l > 30 && buffer.charAt(l-1)==' ') {
+  if ( currentLine < MaxLines && l > 40 && buffer.charAt(l-1)==' ') {
     textlines[currentLine] = buffer.substring( 0, l-1);
     currentLine++;
     buffer="";
@@ -762,7 +764,7 @@ void displayText() {
   }
   textlines[currentLine] = buffer;
   for ( int i=0; i<=currentLine; i++ ) {  
-    text( textlines[i], offsetX, 30 + i*20);
+    text( textlines[i], offsetX, 30 + i*25);
   }
   noFill();
 }
@@ -777,41 +779,47 @@ void retrieveLine() {
 void showInstruction() {
   textSize(14);
   fill(256, 256, 0);
-  text( instruction, 10, 450 );
-  text( instruction2, 10, 465 );
+  text( instruction, 10, 360 );
+  text( instruction2, 10, 380 );
   noFill();
 }
 
 void displayBuffer() {
-
+  int vs = 15, y=285;
   fill(255, 0, 0);
   textSize(30);
 
-  text( buffer.toUpperCase().replaceAll(" ", "_"), 10, -66 );
+  text( buffer.toUpperCase().replaceAll(" ", "_"), 10, -25 );
 
   textSize(16);
-  if ( voiceon) {
-    fill(0, 128, 128);
-    text( "voice feedback on", 10, 365);
-  }
-  if ( soundon) {
-    fill(0, 128, 128);
-    text( "sound on", 10, 380);
-  }
-  if ( !callbellReady) {
-    fill(255, 0, 0);
-    text( "alarm off", 10, 410);
-  }
-  if ( !announceon) {
-    fill(255, 0, 0);
-    text( "NO ANNOUNCEMENT", 10, 430);
-  }
   fill(0, 128, 128);
   if ( inputType == MORSE ) {
-    text("speed is " +  Integer.toString(morseSpeed), 10, 395 );
+    text("speed is " +  Integer.toString(morseSpeed), 10, y );
     displayMorse();
   } else 
-    text("speed is " +  Integer.toString(speed), 10, 395 );
+    text("speed is " +  Integer.toString(speed), 10, y );
+
+  if ( voiceon) {
+    y+=vs;
+    fill(0, 128, 128);
+    text( "voice feedback on", 10, y);
+  }
+  if ( soundon) {
+    y+=vs;
+    fill(0, 128, 128);
+    text( "sound on", 10, y);
+  }
+  if ( !callbellReady) {
+    y+=vs;
+    fill(255, 0, 0);
+    text( "alarm off", 10, y);
+  }
+  if ( !announceon) {
+    y+=vs;
+    fill(255, 0, 0);
+    text( "NO ANNOUNCEMENT", 10, y);
+  }
+  fill(0, 128, 128);
 }
 
 void displayMorse() {
@@ -848,7 +856,7 @@ void readIt() {
   pauseFor( 100*txt.length(), false);
   lastPresented = millis();
   lastPresented += 300*txt.length() + 5000; 
-  
+
   if ( useGoogle ) {
     readByGoogle(txt);
   } else if ( useBrowser ) {
@@ -864,7 +872,7 @@ void readByEspeak(String txt) {
   try {
     String[] args1 = {
       //"/usr/local/bin/speak", "-ven+f4", "-g 7", txt
-      "say", "-v", "Samantha", txt
+      "say", "-v", "vicki", "-r", "200", txt
     };
     Runtime r = Runtime.getRuntime();
     Process p = r.exec(args1);
@@ -957,7 +965,7 @@ void pause() {
 
     frameRate(FRAME_RATE);
     firstTimeMorse = millis();
-
+    selected = 0; //============== normal mode
     curItem = "menu5";
   }
   lastPresented = millis();
