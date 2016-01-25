@@ -16,6 +16,9 @@
 int cbPeriod = 1400;   
 int speed = 7;
 
+//pause
+int PAUSE_TIME = 60;
+
 // if selected within debounce, consider it is intended for the previous item
 int cbDebounce = 100; 
 // right after an action, if not yet presented, then present it after this cbPresentLead period
@@ -162,7 +165,7 @@ void doCB() {
       break;
     case 9:
       prevItem = "pause";
-      pauseFor( 180*seconds, true );    
+      pauseFor( PAUSE_TIME*seconds, true );    
 
       break;
     case 99:

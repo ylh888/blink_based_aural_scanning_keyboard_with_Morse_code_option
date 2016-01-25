@@ -66,7 +66,7 @@ int inputType = REGULAR;
 boolean MARK = false;
 
 // message store
-final int MaxLines = 16;
+final int MaxLines = 12;
 String[] textlines = new String[MaxLines+1];
 int currentLine = 0;
 
@@ -137,7 +137,7 @@ void setup() {
 
   textlines[0]="";
   /* test new fragments of speech here */
-  if ( true  ) {
+  if ( false  ) {
     textlines[0] = "The quick brown fox jumps over the lazy dog";
     textlines[1] = "Please turn on the TV";
     textlines[2] = "Thank you";
@@ -159,9 +159,9 @@ void setup() {
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
   } else {
-    video = new Capture(this, "name=USB2.0_Camera,size="  //U cam webcam
+    //video = new Capture(this, "name=USB2.0_Camera,size="  //U cam webcam
     //video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
-    //video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
+    video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
     + camWidth + "x" 
       + camHeight + ",fps=30" ); 
     // video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
@@ -570,9 +570,9 @@ void doPhase5() {
       ( Core.minMaxLoc(noRes).maxVal > Core.minMaxLoc(yesRes).maxVal )  ) {
 
       // "No" - not used yet
-      selected = 2; // no
+      selected = 0; // no
       
-      pauseFor( 60000, true );  // 'no' gesture means 60s pause
+      //pauseFor( 60000, true );  // 'no' gesture means 60s pause
       /*
        fill(255, 0, 0);
        rect(foundROI.x, foundROI.y, foundROI.width, foundROI.height); 
@@ -754,7 +754,7 @@ void captureEvent(Capture c) {
 
 void displayText() {
   fill(0, 255, 0);
-  textSize(24);
+  textSize(30);
   int l=buffer.length();
   if ( currentLine < MaxLines && l > 40 && buffer.charAt(l-1)==' ') {
     textlines[currentLine] = buffer.substring( 0, l-1);
@@ -764,7 +764,7 @@ void displayText() {
   }
   textlines[currentLine] = buffer;
   for ( int i=0; i<=currentLine; i++ ) {  
-    text( textlines[i], offsetX, 30 + i*25);
+    text( textlines[i], offsetX, 30 + i*32);
   }
   noFill();
 }
