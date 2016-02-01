@@ -17,6 +17,7 @@
 
 int inDelete = 0;  
 int morseSpeed = 4;
+int units = 400;  // morse units
 
 boolean wroteSpace = true; // write only one ' ' letter
 int firstTimeMorse = 0;

@@ -13,8 +13,8 @@
  
  */
 // present, wait for cbPeriod before moving to next item
-int cbPeriod = 1400;   
-int speed = 7;
+int cbPeriod = 1450;   
+int speed = 5;
 
 //pause
 int PAUSE_TIME = 60;
@@ -340,9 +340,9 @@ void slower() {
   }
 
   // adjust all other input types here
-  cbPeriod +=200;
-  if ( cbPeriod > 2800 ) cbPeriod = 2800;
-  speed = (2800 - cbPeriod)/200;
+  cbPeriod +=150;
+  if ( cbPeriod > 2200 ) cbPeriod = 2200;
+  speed = (2200 - cbPeriod)/150;
 }
 
 void faster() {
@@ -353,8 +353,8 @@ void faster() {
     return;
   }
   // adjust all other input types here
-  cbPeriod -=200;
-  if ( cbPeriod < 800 ) cbPeriod = 800;
-  speed = (2800 - cbPeriod)/200;
+  cbPeriod -=150;
+  if ( cbPeriod < 700 ) cbPeriod = 700;
+  speed = (2200 - cbPeriod)/150;
 }
 
