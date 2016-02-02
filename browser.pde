@@ -1,4 +1,4 @@
-/* browser - safari 
+/* browser - safari  
  mode = BROWSER
  action = 5
  */
