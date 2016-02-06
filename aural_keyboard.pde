@@ -90,6 +90,7 @@ int selected = 0;
 
 // below for eye camera use (see test_borescope.pde)
 // i.e. useWebcam == false
+String foundCamera = null;
 int camWidth = 160;
 int camHeight = 120;// 128;
 PImage[] imL;
@@ -126,26 +127,30 @@ void setup() {
 
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
+    foundCamera = "Laptop's Webcam";
+    video.start();
   } else {
-    //video = new Capture(this, "name=USB2.0_Camera,size="  //U cam webcam
-    //video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
-    video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
-    + camWidth + "x" 
-      + camHeight + ",fps=30" ); 
-    // video = new Capture(this, "name=USB 2.0 Camera,size=80x64,fps=30");//name=USB 2.0 Camera,size=320x256,fps=15");  // using alternate camera
-    try {
-      video.start();
-    }
-    catch( Exception ex ) {
-      fill(0, 0, 0);
-      rect(0, 0, width, height);
-      fill(200, 50, 50);
-      textSize(32);
-      text( "Cannot detect Eye Scope.", offsetX-50, offsetY );
-      text( "Please plug it in and re-start the program.", offsetX-50, offsetY+40 );
-      delay(10000);
-      //exit();
-    }
+    /* old code: hard codes device; now we use selectCamera() in draw()
+     //video = new Capture(this, "name=USB2.0_Camera,size="  //U cam webcam
+     //video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
+     video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
+     //video = new Capture(this, "name=USB2.0 PC CAMERA,size="  // borescope - 7mm 'Android'
+     + camWidth + "x" + camHeight + ",fps=30" ); 
+     
+     try {
+     video.start();
+     }
+     catch( Exception ex ) {
+     fill(0, 0, 0);
+     rect(0, 0, width, height);
+     fill(200, 50, 50);
+     textSize(32);
+     text( "Cannot detect Eye Scope.", offsetX-50, offsetY );
+     text( "Please plug it in and re-start the program.", offsetX-50, offsetY+40 );
+     delay(10000);
+     //exit();
+     }
+     */
   }
 
   opencv = new OpenCV(this, 640/SCALE, 480/SCALE);
@@ -159,7 +164,8 @@ void setup() {
     imL = new PImage[10];
   }
 
-  video.start();
+  // old code kicks starts video here
+  //video.start();
 
   /*
   clk = new ClickButton(0, false);
@@ -182,13 +188,6 @@ void setup() {
   frameRate(FRAME_RATE);
 }
 
-void checkCam() {
-  video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
-  + camWidth + "x" 
-    + camHeight + ",fps=30" ); 
-  delay(1000);
-  loop();
-}
 
 void draw() {
 
@@ -208,19 +207,15 @@ void draw() {
   rect(0, 0, width, height);
   noFill();
 
-  /*
-  if ( video.available() == false ) {
-   noLoop();
-   textSize(32);
-   fill( 0, 255, 0);
-   text( "Cannot detect Eye Scope.", offsetX-50, offsetY );
-   text( "Please plug it in and re-start the program.", offsetX-50, offsetY+40 );
-   delay(1000);
-   video.stop();
-   checkCam();
-   return;
-   }
-   */
+  if ( foundCamera == null) {
+    foundCamera = selectCamera ();
+    if ( foundCamera == null ) return;
+    println( foundCamera );
+    video = new Capture( this, foundCamera );
+    video.start();
+    delay(1000); // don't start right away
+    return;
+  }
 
   displayText(); // display in the main frame
 
@@ -920,6 +915,32 @@ void ListCameras() {
     }
   }
 }
+
+String selectCamera() { 
+  println( "No Camera" );
+  fill(0, 0, 0);
+  rect(0, 0, width, height);
+  fill(200, 50, 50);
+  textSize(32);
+  text( "Please plug in Eye Scope. Wait 15 seconds ...", offsetX-50, offsetY );
+  text( "(Restart program if setup screen does not appear)", offsetX-50, offsetY+40 );
+
+  String[] cameras = Capture.list();
+
+  if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    return null;
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      if ( cameras[i].indexOf("USB") > 0 && cameras[i].indexOf(camWidth + "x" + camHeight) > 0 )
+        return cameras[i];
+    }
+  }
+  return null;
+}
+
+
 void debugROI(String s) {
   if ( debug) {
     println( s + " ROI:   " + ROI.x + " " + ROI.y + " " + ROI.width+ " " + ROI.height );
