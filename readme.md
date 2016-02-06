@@ -1,6 +1,12 @@
 ## Blink-based Aural Scanning Keyboard with Morse Code option
 
+
 Using a simple template matching technique, this Processing-based app makes it possible to type text using blinks only. The app distinguishes 3 types of eye patterns that are registered at initialization: normal, action, extra-action (corresponding, typically, to a normal eye gaze, eye rolled-up, and eye shut).
+
+An earlier version uses webcam, and is demonstarted here: 
+https://www.youtube.com/watch?v=1--6nZVQz3c
+
+The latest version uses closely mounted USB borescope that looks at the eye. No video demo yet.
 
 The user is prompted with the **row** number (row of letters) and, on blink ("action" pattern), then individual letters within that row. 
 
