@@ -123,7 +123,7 @@ void setup() {
   buzzDot = new Buzzer( 1200, 0.1 ); 
   buzzAlarm = new Buzzer( 1200, 0.8 );  
 
-  if ( debug ) ListCameras();
+  /*if ( debug )*/  ListCameras();
 
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
@@ -134,7 +134,7 @@ void setup() {
      //video = new Capture(this, "name=USB2.0_Camera,size="  //U cam webcam
      //video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
      video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
-     //video = new Capture(this, "name=USB2.0 PC CAMERA,size="  // borescope - 7mm 'Android'
+     //video = new Capture(this, "name=2.0 PC CAMERA,size="  // borescope - 7mm 'Android'
      + camWidth + "x" + camHeight + ",fps=30" ); 
      
      try {
@@ -151,6 +151,17 @@ void setup() {
      //exit();
      }
      */
+    while ( foundCamera == null) {
+      foundCamera = selectCamera ();
+      if ( foundCamera != null ) {//continue;
+        print( "========>FOUND CAMERA: " );
+        println( foundCamera );
+        video = new Capture( this, foundCamera );
+        video.start();
+        delay(2000); // don't start right away
+        //return;
+      }
+    }
   }
 
   opencv = new OpenCV(this, 640/SCALE, 480/SCALE);
@@ -207,13 +218,14 @@ void draw() {
   rect(0, 0, width, height);
   noFill();
 
-  if ( foundCamera == null) {
+  if ( foundCamera == null) { // redundant code - in setup() already
     foundCamera = selectCamera ();
     if ( foundCamera == null ) return;
+    print( "========>FOUND CAMERA: " );
     println( foundCamera );
     video = new Capture( this, foundCamera );
     video.start();
-    delay(1000); // don't start right away
+    delay(2000); // don't start right away
     return;
   }
 
