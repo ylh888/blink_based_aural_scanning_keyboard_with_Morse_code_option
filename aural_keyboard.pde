@@ -123,7 +123,7 @@ void setup() {
   buzzDot = new Buzzer( 1200, 0.1 ); 
   buzzAlarm = new Buzzer( 1200, 0.8 );  
 
-  if ( debug ) ListCameras();
+  if ( debug )  ListCameras();
 
   if ( useWebcam ) {
     video = new Capture(this, 640/SCALE, 480/SCALE);
@@ -134,23 +134,19 @@ void setup() {
      //video = new Capture(this, "name=USB2.0_Camera,size="  //U cam webcam
      //video = new Capture(this, "name=USB 2.0 Camera,size="  //webcam
      video = new Capture(this, "name=USB 2.0 PC Cam,size="  // borescope
-     //video = new Capture(this, "name=USB2.0 PC CAMERA,size="  // borescope - 7mm 'Android'
+     //video = new Capture(this, "name=2.0 PC CAMERA,size="  // borescope - 7mm 'Android'
      + camWidth + "x" + camHeight + ",fps=30" ); 
-     
-     try {
-     video.start();
-     }
-     catch( Exception ex ) {
-     fill(0, 0, 0);
-     rect(0, 0, width, height);
-     fill(200, 50, 50);
-     textSize(32);
-     text( "Cannot detect Eye Scope.", offsetX-50, offsetY );
-     text( "Please plug it in and re-start the program.", offsetX-50, offsetY+40 );
-     delay(10000);
-     //exit();
-     }
      */
+    while ( foundCamera == null) {
+      foundCamera = selectCamera ();
+      if ( foundCamera != null ) {
+        print( "========>FOUND CAMERA: " );
+        println( foundCamera );
+        video = new Capture( this, foundCamera );
+        video.start();
+        delay(2000); // don't start right away
+      }
+    }
   }
 
   opencv = new OpenCV(this, 640/SCALE, 480/SCALE);
@@ -166,13 +162,6 @@ void setup() {
 
   // old code kicks starts video here
   //video.start();
-
-  /*
-  clk = new ClickButton(0, false);
-   clk.debounceTime = 10;
-   clk.multiclickTime = 800;
-   clk.longClickTime = 1500;
-   */
 
   try {
     robot = new Robot();
@@ -207,13 +196,14 @@ void draw() {
   rect(0, 0, width, height);
   noFill();
 
-  if ( foundCamera == null) {
+  if ( foundCamera == null) { // redundant code - in setup() already
     foundCamera = selectCamera ();
     if ( foundCamera == null ) return;
+    print( "========>FOUND CAMERA: " );
     println( foundCamera );
     video = new Capture( this, foundCamera );
     video.start();
-    delay(1000); // don't start right away
+    delay(2000); // don't start right away
     return;
   }
 
@@ -243,12 +233,6 @@ void draw() {
     doPhase5();
     break;
   }
-
-  /*
-  if ( clk.clicks != 0 ) 
-   println ( iters, ":: ", clk.clicks );
-   iters++;
-   */
 
   popMatrix();
 }
@@ -345,16 +329,6 @@ void keyPressed() {
       if (key == 'p' ) { 
         if ( !pause ) pauseFor(0, false);
         else pause();
-        /*
-        if ( pause && inputType == MORSE ) {
-         firstTimeMorse = millis();
-         morseStr = "";
-         }
-         pause = !pause;  
-         if (pause) whenPaused = millis();
-         lastPresented = millis()+2*seconds;
-         frameRate(FRAME_RATE);
-         */
       }   
       if (key == 's' ) soundon = !soundon;
       if (key == 'v' ) voiceon = !voiceon;
@@ -457,8 +431,6 @@ void doPhase5() {
       IMsource = trans2( IMnormal ); 
       image( IMsource, -IMnormal.width, 0) ; 
 
-      //  println("5imange:" +IMsource.width+" "+IMsource.height);
-
       opencv = new OpenCV( this, IMsource );
       opencv.setROI(0, 0, IMsource.width, IMsource.height);
       Mroi = opencv.getROI().clone(); 
@@ -547,9 +519,7 @@ void doPhase5() {
     fill(0, 0, 255);
     rect(0, 0, foundROI.width, foundROI.height); 
     noFill();
-    //noCount =0; // reset 
-    //yesCount++;
-    print(".");
+
     if ( !MARK && ((millis()-firstTimeMorse ) > 2*seconds) ) {
       timeLapse = millis() - lastTransit;
       lastTransit = millis();
@@ -572,14 +542,7 @@ void doPhase5() {
       selected = 0; // no
 
       //pauseFor( 60000, true );  // 'no' gesture means 60s pause
-      /*
-       fill(255, 0, 0);
-       rect(foundROI.x, foundROI.y, foundROI.width, foundROI.height); 
-       noFill();
-       */
-      //buzzDot.on(50);
-      //noCount++;
-      println("XXX");
+
       /* YLH - use NO to reset morse buffer
        if ( inputType==MORSE ) {
        morseStr="";
@@ -589,12 +552,7 @@ void doPhase5() {
        lastTransit = millis()-3*seconds;
        }
        */
-      // if ( callbellReady && ( noCount > alarmThreshold )) 
-      // buzzAlarm.on(2000);
     } else { // normal
-      //spaceCount++;
-      //noCount = 0; // reset alarm1
-      //print(" ");
 
       if ( MARK  && ((millis()-firstTimeMorse ) > 2*seconds) ) {  
         timeLapse = millis() - lastTransit;
@@ -967,8 +925,8 @@ PImage process(int i, PImage inputImg) {
   ocv.equalizeHistogram();
 
   ocv.contrast(1.3);
-  //ocv.invert();
 
+  // experiment with different pre-processing
   //ocv.threshold(128);
   //ocv.dilate();
   //ocv.erode();
