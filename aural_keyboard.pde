@@ -115,8 +115,9 @@ void setup() {
     if (false) exit();
   }   
 
-  //size(640, 480);
-  size(screenWidth, screenHeight);
+  //size(1240, 880);
+  //size(screenWidth, screenHeight);
+  fullScreen();
 
 
   buzzDash = new Buzzer( 1000, 0.1 );
@@ -922,6 +923,7 @@ PImage process(int i, PImage inputImg) {
   //retImg = get( i*wd, 0, wd, ht);
   ocv = new OpenCV( this, inputImg, false );
 
+  ocv.blur(4);
   ocv.equalizeHistogram();
 
   ocv.contrast(1.3);
@@ -957,4 +959,3 @@ PImage process(int i, PImage inputImg) {
 
   return imL[i];
 }
-

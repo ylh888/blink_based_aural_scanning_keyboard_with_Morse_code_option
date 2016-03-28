@@ -1,492 +1,492 @@
 {
-  "apostrophe": {
-    "Skip": "menu4",
+  "retrieve_line": {
     "sound": 0,
-    "action": 0,
-    "doNext": "menu1"
+    "Skip": "call_bell",
+    "action": 3,
+    "doNext": "menu5"
   },
-  "menu2": {
-    "Skip": "menu3",
+  "space": {
     "sound": 1,
-    "action": 0,
-    "doNext": "g"
+    "Skip": "delete",
+    "action": 1,
+    "doNext": "menu5",
+    "substitute": " "
   },
-  "menu1": {
-    "Skip": "menu2",
+  "quote": {
     "sound": 2,
-    "action": 0,
-    "doNext": "a"
-  },
-  "menu4": {
-    "Skip": "menu5",
-    "sound": 3,
-    "action": 0,
-    "doNext": "t"
-  },
-  "menu3": {
     "Skip": "menu4",
-    "sound": 4,
-    "action": 0,
-    "doNext": "n"
-  },
-  "erase_coming": {
-    "Skip": "erase_text",
-    "sound": 5,
-    "action": 0,
-    "doNext": "menu5"
-  },
-  "line_retrieved": {"sound": 6},
-  "menu5": {
-    "Skip": "menu1",
-    "sound": 7,
-    "action": 0,
-    "doNext": "space"
-  },
-  "tab": {
-    "Skip": "url",
-    "sound": 8,
-    "action": 1,
-    "doNext": "gotyping"
-  },
-  "use_morse": {
-    "Skip": "retrieve_line",
-    "sound": 9,
-    "action": 8,
-    "doNext": "menu5"
-  },
-  "call_bell": {
-    "Skip": "menu5",
-    "sound": 10,
-    "action": 99,
-    "doNext": "menu5"
-  },
-  "pause": {
-    "Skip": "use_morse",
-    "sound": 11,
-    "action": 9,
-    "doNext": "menu5"
-  },
-  "no_match": {"sound": 12},
-  "!": {
-    "Skip": "menu4",
-    "sound": 13,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "letter": {
-    "Skip": "word",
-    "sound": 14,
-    "action": 4,
-    "doNext": "menu5"
-  },
-  "browsermenu": {
-    "Skip": "menu1",
-    "sound": 15,
-    "action": 0,
-    "doNext": "pagedown"
-  },
-  "pageback": {
-    "Skip": "pageforward",
-    "sound": 16,
-    "action": 1,
-    "doNext": "pagedown"
-  },
-  "+": {
-    "Skip": "menu4",
-    "sound": 17,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "pageup": {
-    "Skip": "return",
-    "sound": 18,
-    "action": 1,
-    "doNext": "gotyping"
-  },
-  ".": {
-    "Skip": "menu4",
-    "sound": 19,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  ",": {
-    "Skip": "menu4",
-    "sound": 20,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "url": {
-    "Skip": "pageback",
-    "sound": 21,
-    "action": 1,
-    "doNext": "gotyping"
-  },
-  "-": {
-    "Skip": "menu4",
-    "sound": 22,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "3": {
-    "Skip": "menu4",
-    "sound": 23,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "2": {
-    "Skip": "menu4",
-    "sound": 24,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "1": {
-    "Skip": "menu4",
-    "sound": 25,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "waking_up": {"sound": 26},
-  "0": {
-    "Skip": "menu4",
-    "sound": 27,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "letter_deleted": {"sound": 28},
-  "7": {
-    "Skip": "menu4",
-    "sound": 29,
     "action": 0,
     "doNext": "menu1"
   },
   "read_text": {
+    "sound": 3,
     "Skip": "pause",
-    "sound": 30,
     "action": 2,
     "doNext": "menu5"
   },
-  "6": {
+  "tab": {
+    "sound": 4,
+    "Skip": "url",
+    "action": 1,
+    "doNext": "gotyping"
+  },
+  "no_match": {"sound": 5},
+  "menu5": {
+    "sound": 6,
+    "Skip": "menu1",
+    "action": 0,
+    "doNext": "space"
+  },
+  "menu4": {
+    "sound": 7,
+    "Skip": "menu5",
+    "action": 0,
+    "doNext": "t"
+  },
+  "menu3": {
+    "sound": 8,
     "Skip": "menu4",
-    "sound": 31,
+    "action": 0,
+    "doNext": "n"
+  },
+  "menu2": {
+    "sound": 9,
+    "Skip": "menu3",
+    "action": 0,
+    "doNext": "g"
+  },
+  "menu1": {
+    "sound": 10,
+    "Skip": "menu2",
+    "action": 0,
+    "doNext": "a"
+  },
+  "!": {
+    "sound": 11,
+    "Skip": "menu4",
     "action": 0,
     "doNext": "menu1"
   },
-  "email": {
-    "Skip": "menu1",
-    "sound": 32,
-    "action": 6,
-    "doNext": "next"
-  },
-  "5": {
+  "use_scanning": {"sound": 12},
+  "+": {
+    "sound": 13,
     "Skip": "menu4",
-    "sound": 33,
+    "action": 0,
+    "doNext": "menu1"
+  },
+  ",": {
+    "sound": 14,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "-": {
+    "sound": 15,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "pause": {
+    "sound": 16,
+    "Skip": "use_morse",
+    "action": 9,
+    "doNext": "menu5"
+  },
+  ".": {
+    "sound": 17,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "0": {
+    "sound": 18,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "1": {
+    "sound": 19,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "2": {
+    "sound": 20,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "pageforward": {
+    "sound": 21,
+    "Skip": "endbrowser",
+    "action": 1,
+    "doNext": "pagedown"
+  },
+  "3": {
+    "sound": 22,
+    "Skip": "menu4",
     "action": 0,
     "doNext": "menu1"
   },
   "4": {
+    "sound": 23,
     "Skip": "menu4",
-    "sound": 34,
     "action": 0,
     "doNext": "menu1"
   },
-  "pagedown": {
-    "Skip": "pageup",
-    "sound": 35,
+  "5": {
+    "sound": 24,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "pageback": {
+    "sound": 25,
+    "Skip": "pageforward",
     "action": 1,
-    "doNext": "gotyping"
+    "doNext": "pagedown"
+  },
+  "6": {
+    "sound": 26,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "letter": {
+    "sound": 27,
+    "Skip": "word",
+    "action": 4,
+    "doNext": "menu5"
+  },
+  "7": {
+    "sound": 28,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "8": {
+    "sound": 29,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "use_morse": {
+    "sound": 30,
+    "Skip": "retrieve_line",
+    "action": 8,
+    "doNext": "menu5"
   },
   "9": {
+    "sound": 31,
     "Skip": "menu4",
-    "sound": 36,
     "action": 0,
+    "doNext": "menu1"
+  },
+  "endbrowser": {
+    "sound": 32,
+    "Skip": "gotyping",
+    "action": 1,
     "doNext": "menu1"
   },
   "word": {
+    "sound": 33,
     "Skip": "erase_coming",
-    "sound": 37,
     "action": 44,
     "doNext": "menu5"
   },
-  "8": {
+  "=": {
+    "sound": 34,
     "Skip": "menu4",
-    "sound": 38,
     "action": 0,
     "doNext": "menu1"
   },
   "?": {
+    "sound": 35,
     "Skip": "menu4",
-    "sound": 39,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "=": {
-    "Skip": "menu4",
-    "sound": 40,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "erase_text": {
-    "Skip": "menu5",
-    "sound": 41,
-    "action": 444,
-    "doNext": "menu5"
-  },
-  "@": {
-    "Skip": "menu4",
-    "sound": 42,
     "action": 0,
     "doNext": "menu1"
   },
   "next": {
+    "sound": 36,
     "Skip": "previous",
-    "sound": 43,
     "action": 1,
-    "substitute": "n",
-    "doNext": "next"
+    "doNext": "next",
+    "substitute": "n"
   },
-  "retrieve_line": {
-    "Skip": "call_bell",
-    "sound": 44,
-    "action": 3,
-    "doNext": "menu5"
-  },
-  "word_deleted": {"sound": 45},
-  "colon": {
+  "@": {
+    "sound": 37,
     "Skip": "menu4",
-    "sound": 46,
     "action": 0,
     "doNext": "menu1"
   },
-  "use_scanning": {"sound": 47},
-  "space": {
-    "Skip": "delete",
-    "sound": 48,
+  "word_deleted": {"sound": 38},
+  "pageup": {
+    "sound": 39,
+    "Skip": "return",
     "action": 1,
-    "substitute": " ",
-    "doNext": "menu5"
-  },
-  "quote": {
-    "Skip": "menu4",
-    "sound": 49,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "browser": {
-    "Skip": "menu5",
-    "sound": 50,
-    "action": 5,
     "doNext": "gotyping"
   },
   "delete": {
+    "sound": 40,
     "Skip": "read_text",
-    "sound": 51,
     "action": 0,
     "doNext": "letter"
   },
-  "_": {
-    "Skip": "menu4",
-    "sound": 52,
-    "action": 0,
-    "doNext": "menu1"
-  },
-  "f": {
-    "Skip": "menu1",
-    "sound": 53,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "g": {
-    "Skip": "h",
-    "sound": 54,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "d": {
-    "Skip": "e",
-    "sound": 55,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "e": {
-    "Skip": "f",
-    "sound": 56,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "previous": {
-    "Skip": "quitMail",
-    "sound": 57,
-    "action": 1,
-    "substitute": "p",
-    "doNext": "next"
-  },
-  "b": {
-    "Skip": "c",
-    "sound": 58,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "c": {
-    "Skip": "d",
-    "sound": 59,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "a": {
-    "Skip": "b",
-    "sound": 60,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "line_stored": {"sound": 61},
-  "return": {
-    "Skip": "tab",
-    "sound": 62,
-    "action": 1,
+  "letter_deleted": {"sound": 41},
+  "line_stored": {"sound": 42},
+  "browser": {
+    "sound": 43,
+    "Skip": "menu5",
+    "action": 5,
     "doNext": "gotyping"
   },
-  "n": {
-    "Skip": "o",
-    "sound": 63,
-    "action": 1,
-    "doNext": "menu1"
+  "erase_text": {
+    "sound": 44,
+    "Skip": "menu5",
+    "action": 444,
+    "doNext": "menu5"
   },
-  "o": {
-    "Skip": "p",
-    "sound": 64,
-    "action": 1,
-    "doNext": "menu1"
+  "call_bell": {
+    "sound": 45,
+    "Skip": "menu5",
+    "action": 99,
+    "doNext": "menu5"
   },
-  "l": {
-    "Skip": "m",
-    "sound": 65,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "m": {
-    "Skip": "menu2",
-    "sound": 66,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "j": {
-    "Skip": "k",
-    "sound": 67,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "pageforward": {
-    "Skip": "endbrowser",
-    "sound": 68,
-    "action": 1,
-    "doNext": "pagedown"
-  },
-  "k": {
-    "Skip": "l",
-    "sound": 69,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "h": {
-    "Skip": "i",
-    "sound": 70,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "i": {
-    "Skip": "j",
-    "sound": 71,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "w": {
-    "Skip": "x",
-    "sound": 72,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "v": {
-    "Skip": "w",
-    "sound": 73,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "u": {
-    "Skip": "v",
-    "sound": 74,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "t": {
-    "Skip": "u",
-    "sound": 75,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "s": {
-    "Skip": "menu3",
-    "sound": 76,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "endbrowser": {
-    "Skip": "gotyping",
-    "sound": 77,
-    "action": 1,
-    "doNext": "menu1"
+  "email": {
+    "sound": 46,
+    "Skip": "menu1",
+    "action": 6,
+    "doNext": "next"
   },
   "semicolon": {
+    "sound": 47,
     "Skip": "menu4",
-    "sound": 78,
     "action": 0,
     "doNext": "menu1"
   },
-  "r": {
-    "Skip": "s",
-    "sound": 79,
+  "browsermenu": {
+    "sound": 48,
+    "Skip": "menu1",
+    "action": 0,
+    "doNext": "pagedown"
+  },
+  "_": {
+    "sound": 49,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "line_retrieved": {"sound": 50},
+  "a": {
+    "sound": 51,
+    "Skip": "b",
     "action": 1,
     "doNext": "menu1"
   },
-  "q": {
-    "Skip": "r",
-    "sound": 80,
-    "action": 1,
-    "doNext": "menu1"
-  },
-  "p": {
-    "Skip": "q",
-    "sound": 81,
+  "b": {
+    "sound": 52,
+    "Skip": "c",
     "action": 1,
     "doNext": "menu1"
   },
   "gotyping": {
+    "sound": 53,
     "Skip": "pagedown",
-    "sound": 82,
     "action": 0,
     "doNext": "menu1"
   },
-  "z": {
+  "c": {
+    "sound": 54,
+    "Skip": "d",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "previous": {
+    "sound": 55,
+    "Skip": "quitMail",
+    "action": 1,
+    "doNext": "next",
+    "substitute": "p"
+  },
+  "d": {
+    "sound": 56,
+    "Skip": "e",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "e": {
+    "sound": 57,
+    "Skip": "f",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "f": {
+    "sound": 58,
+    "Skip": "menu1",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "g": {
+    "sound": 59,
+    "Skip": "h",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "h": {
+    "sound": 60,
+    "Skip": "i",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "i": {
+    "sound": 61,
+    "Skip": "j",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "j": {
+    "sound": 62,
+    "Skip": "k",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "k": {
+    "sound": 63,
+    "Skip": "l",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "l": {
+    "sound": 64,
+    "Skip": "m",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "m": {
+    "sound": 65,
+    "Skip": "menu2",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "url": {
+    "sound": 66,
+    "Skip": "pageback",
+    "action": 1,
+    "doNext": "gotyping"
+  },
+  "n": {
+    "sound": 67,
+    "Skip": "o",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "o": {
+    "sound": 68,
+    "Skip": "p",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "apostrophe": {
+    "sound": 69,
     "Skip": "menu4",
-    "sound": 83,
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "pagedown": {
+    "sound": 70,
+    "Skip": "pageup",
+    "action": 1,
+    "doNext": "gotyping"
+  },
+  "p": {
+    "sound": 71,
+    "Skip": "q",
     "action": 1,
     "doNext": "menu1"
   },
-  "y": {
-    "Skip": "z",
-    "sound": 84,
+  "q": {
+    "sound": 72,
+    "Skip": "r",
     "action": 1,
     "doNext": "menu1"
   },
-  "x": {
-    "Skip": "y",
-    "sound": 85,
+  "r": {
+    "sound": 73,
+    "Skip": "s",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "s": {
+    "sound": 74,
+    "Skip": "menu3",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "t": {
+    "sound": 75,
+    "Skip": "u",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "u": {
+    "sound": 76,
+    "Skip": "v",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "v": {
+    "sound": 77,
+    "Skip": "w",
     "action": 1,
     "doNext": "menu1"
   },
   "quitMail": {
+    "sound": 78,
     "Skip": "menu5",
-    "sound": 86,
     "action": 6,
     "doNext": "menu1"
+  },
+  "w": {
+    "sound": 79,
+    "Skip": "x",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "x": {
+    "sound": 80,
+    "Skip": "y",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "colon": {
+    "sound": 81,
+    "Skip": "menu4",
+    "action": 0,
+    "doNext": "menu1"
+  },
+  "y": {
+    "sound": 82,
+    "Skip": "z",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "z": {
+    "sound": 83,
+    "Skip": "menu4",
+    "action": 1,
+    "doNext": "menu1"
+  },
+  "waking_up": {"sound": 84},
+  "return": {
+    "sound": 85,
+    "Skip": "tab",
+    "action": 1,
+    "doNext": "gotyping"
+  },
+  "erase_coming": {
+    "sound": 86,
+    "Skip": "erase_text",
+    "action": 0,
+    "doNext": "menu5"
   }
 }
