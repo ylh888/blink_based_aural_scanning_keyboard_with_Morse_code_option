@@ -22,7 +22,13 @@ The app has option for sounding a bell.
 ### Installation
 
 1. You need the [Processing environment](https://processing.org/)
-2. Within Processing, add the following libraries: **OpenCV**, **minim**
+2. Within Processing, add the following libraries: **OpenCV**, **minim**, **video**
+
+The code is designed to work currently with a [borescope with side camera](https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20161004130711&SearchText=5.5mm+7mm+borescope+) If you want to run the code with a standard webcam on your computer change line 35 of aural_keyboard.pde to true. i.e.
+
+`boolean useWebcam = true; // use webcam (true) or eye cam (false)`
+
+For more detailed information when running this read the [manual](manual.md).
 
 It is also possible to get a pre-compiled version for OSX and Windows 64.
 
@@ -42,6 +48,3 @@ The code works well but needs refactoring to be more easily maintained. Some act
 Use under MIT license. The code writer assumes no liability for the program's use.
 
 (C) [Ability Spectrum](http://abilityspectrum.com), 2015-2016.
-
-
-
